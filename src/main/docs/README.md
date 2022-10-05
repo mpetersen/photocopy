@@ -1,4 +1,4 @@
-# photocopy
+# ${project.name}
 
 ## Installation
 
@@ -6,9 +6,9 @@ Add the following dependency:
 
 ```
 <dependency>
-    <groupId>de.moritzpetersen</groupId>
-    <artifactId>photocopy</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>${project.groupId}</groupId>
+    <artifactId>${project.artifactId}</artifactId>
+    <version>${project.version}</version>
 </dependency>
 ```
 
