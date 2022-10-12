@@ -6,18 +6,35 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import lombok.Getter;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Date;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.TimeZone;
 
 public class PhotoMetadata {
 
   private static final int TAG_DATE_TIME = 306;
-  @Getter private final Date dateTime;
+  private static final int TAG_DATE_TIME_ORIGINAL = 36867;
+  private static final int TAG_TIME_ZONE = 36880;
 
-  public PhotoMetadata(File file) throws ImageProcessingException, IOException {
-    Metadata metadata = ImageMetadataReader.readMetadata(file);
-    ExifIFD0Directory exifIFD0Directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-    dateTime = exifIFD0Directory.getDate(TAG_DATE_TIME);
+  @Getter private final LocalDateTime dateTime;
+
+  public PhotoMetadata(Path path) throws IOException, ImageProcessingException {
+    this(Files.newInputStream(path));
+  }
+
+  public PhotoMetadata(InputStream in) throws ImageProcessingException, IOException {
+    try (in) {
+      Metadata metadata = ImageMetadataReader.readMetadata(in);
+      ExifIFD0Directory directory =
+          metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+
+      Instant instant = directory.getDate(TAG_DATE_TIME, TimeZone.getDefault()).toInstant();
+      dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+    }
   }
 }
