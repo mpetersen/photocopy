@@ -1,4 +1,4 @@
-package de.moritzpetersen.photocopy;
+package de.moritzpetersen.photocopy.version;
 
 public interface VersioningStrategy {
   void inc();

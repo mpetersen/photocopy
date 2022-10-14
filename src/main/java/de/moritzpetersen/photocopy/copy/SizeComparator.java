@@ -1,4 +1,4 @@
-package de.moritzpetersen.photocopy;
+package de.moritzpetersen.photocopy.copy;
 
 import java.io.IOException;
 import java.nio.file.Files;

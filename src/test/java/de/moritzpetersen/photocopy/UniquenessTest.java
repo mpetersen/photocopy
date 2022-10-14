@@ -1,5 +1,8 @@
 package de.moritzpetersen.photocopy;
 
+import de.moritzpetersen.photocopy.copy.SizeComparator;
+import de.moritzpetersen.photocopy.copy.Uniqueness;
+import de.moritzpetersen.photocopy.version.VersionedPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

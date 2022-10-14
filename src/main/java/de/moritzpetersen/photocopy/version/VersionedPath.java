@@ -1,4 +1,4 @@
-package de.moritzpetersen.photocopy;
+package de.moritzpetersen.photocopy.version;
 
 import lombok.Setter;
 

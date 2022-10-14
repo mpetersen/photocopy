@@ -1,5 +1,6 @@
 package de.moritzpetersen.photocopy;
 
+import de.moritzpetersen.photocopy.version.VersionedPath;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;

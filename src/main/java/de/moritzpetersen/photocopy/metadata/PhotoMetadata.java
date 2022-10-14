@@ -1,4 +1,4 @@
-package de.moritzpetersen.photocopy;
+package de.moritzpetersen.photocopy.metadata;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;

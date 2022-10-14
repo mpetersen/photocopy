@@ -1,4 +1,4 @@
-package de.moritzpetersen.photocopy;
+package de.moritzpetersen.photocopy.copy;
 
 import java.nio.file.Path;
 

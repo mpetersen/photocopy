@@ -1,4 +1,6 @@
-package de.moritzpetersen.photocopy;
+package de.moritzpetersen.photocopy.copy;
+
+import de.moritzpetersen.photocopy.version.VersionedPath;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

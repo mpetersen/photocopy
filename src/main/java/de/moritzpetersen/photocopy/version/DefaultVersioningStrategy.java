@@ -1,4 +1,4 @@
-package de.moritzpetersen.photocopy;
+package de.moritzpetersen.photocopy.version;
 
 public class DefaultVersioningStrategy implements VersioningStrategy {
   private int version = 1;
