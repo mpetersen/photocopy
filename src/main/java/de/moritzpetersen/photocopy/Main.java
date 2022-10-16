@@ -11,7 +11,7 @@ public class Main {
   public static void main(String[] args) throws Exception {
     Config config = Config.load();
 
-    Path source = config.getSource();
+    Path source = Path.of(args[0]);
     Path target = config.getTarget();
     String formatStr = config.getFormatStr();
 

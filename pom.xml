@@ -14,6 +14,82 @@
       <url>https://moritzpetersen.de/maven</url>
     </repository>
   </repositories>
+  <build>
+    <plugins>
+      <!-- https://github.com/evolvedbinary/appbundler-maven-plugin -->
+      <!--plugin>
+        <groupId>com.evolvedbinary.appbundler</groupId>
+        <artifactId>appbundler-maven-plugin</artifactId>
+        <version>1.1.0</version>
+        <executions>
+          <execution>
+            <id>bundle-my-mac-app</id>
+            <phase>package</phase>
+            <goals>
+              <goal>bundle</goal>
+            </goals>
+            <configuration>
+              <displayName>Phtotocopy</displayName>
+              <identifier>de.moritzpetersen.photocopy.app.Main</identifier>
+              <mainClassName>de.moritzpetersen.photocopy.app.Main</mainClassName>
+              <version>${project.version}</version>
+              <shortVersion>${project.version}</shortVersion>
+              <icon>artwork/icon.icns</icon>
+              <copyright>${project.inceptionYear} Moritz Petersen</copyright>
+              <options>
+                <option>-Xms128m</option>
+                <option>-Dfile.encoding=UTF-8</option>
+                <option>-Xdock:name=Photocopy</option>
+              </options>
+              <explicitClassPath>false</explicitClassPath>
+              <isDebug>true</isDebug>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin-->
+      <!-- https://github.com/federkasten/appbundle-maven-plugin -->
+      <!--plugin>
+        <groupId>sh.tak.appbundler</groupId>
+        <artifactId>appbundle-maven-plugin</artifactId>
+        <version>1.2.0</version>
+        <configuration>
+          <bundleName>Photocopy</bundleName>
+          <mainClass>${project.groupId}.${project.artifactId}.app.Main</mainClass>
+          <iconFile>artwork/icon.icns</iconFile>
+          <generateDiskImageFile>true</generateDiskImageFile>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>bundle</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin-->
+      <plugin>
+        <groupId>sh.tak.appbundler</groupId>
+        <artifactId>appbundle-maven-plugin</artifactId>
+        <version>1.2.0</version>
+        <configuration>
+          <mainClass>${project.groupId}.${project.artifactId}.app.Main</mainClass>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>bundle</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>    </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+  </build>
   <dependencies>
     <dependency>
       <groupId>com.drewnoakes</groupId>
