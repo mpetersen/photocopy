@@ -1,29 +1,35 @@
 package de.moritzpetersen.photocopy.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
 @Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Config {
   private static final String DEFAULT_CONFIG_FILE =
       System.getenv("HOME") + "/.photocopy/config.json";
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  @JsonProperty("format")
+  @JsonProperty("renameOnCopy")
   private String formatStr;
 
   @JsonProperty private Path source;
   @JsonProperty private Path target;
+  @JsonProperty private boolean openAfterCopy;
 
-  @JsonProperty("erase")
+  @JsonProperty("eraseBeforeCopy")
   private boolean eraseEnabled;
 
-  @JsonProperty("eject")
+  @JsonProperty("ejectAfterCopy")
   private boolean ejectEnabled;
 
   public static Config load() throws IOException {
@@ -35,7 +41,8 @@ public class Config {
     }
   }
 
-  public void save() throws IOException {
-    MAPPER.writeValue(new File(DEFAULT_CONFIG_FILE), this);
+  @SneakyThrows
+  public void save() {
+    MAPPER.writerWithDefaultPrettyPrinter().writeValue(new File(DEFAULT_CONFIG_FILE), this);
   }
 }

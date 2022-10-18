@@ -1,9 +1,8 @@
-package de.moritzpetersen.photocopy;
+package de.moritzpetersen.photocopy.metadata;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
-import de.moritzpetersen.photocopy.metadata.PhotoMetadata;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
