@@ -1,5 +1,6 @@
 package de.moritzpetersen.photocopy.volume;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -43,4 +44,8 @@ public class Volume {
     public int hashCode() {
         return Objects.hash(name);
     }
+
+  public Path toPath() {
+    return Path.of("/Volumes", name);
+  }
 }

@@ -1,25 +1,28 @@
 package de.moritzpetersen.photocopy;
 
+import de.moritzpetersen.factory.Factory;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.copy.CopyProcessor;
 import de.moritzpetersen.photocopy.copy.CopyStats;
 
+import javax.inject.Inject;
+import java.io.IOException;
 import java.nio.file.Path;
-import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutionException;
 
 public class Main {
-  public static void main(String[] args) throws Exception {
-    Config config = new Config();
+  @Inject private Config config;
+  @Inject private CopyProcessor copyProcessor;
 
+  public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
+    Factory.create(Main.class).run(args);
+  }
+
+  public void run(String[] args) throws IOException, ExecutionException, InterruptedException {
     Path source = Path.of(args[0]);
-    Path target = config.getTarget();
-    String formatStr = config.getFormatStr();
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatStr);
-
     CopyStats stats = new CopyStats();
 
-    new CopyProcessor().doCopy(source, target, stats, formatter);
+    copyProcessor.doCopy(source, config, stats);
 
     System.out.printf(
         "Copied %s bytes in %s s (%.2f MB/s)",

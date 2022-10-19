@@ -1,8 +1,8 @@
 package de.moritzpetersen.photocopy.util;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -13,7 +13,8 @@ public class AppProperties {
   private final String group;
   private final String id;
 
-  public AppProperties() throws IOException {
+  @SneakyThrows
+  public AppProperties() {
     try (InputStream in = ClassLoader.getSystemResourceAsStream("app.properties")) {
       Properties props = new Properties();
       props.load(in);

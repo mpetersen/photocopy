@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Slf4j
 public class Config {
   private static final String DEFAULT_CONFIG_FILE =
       System.getenv("HOME") + "/.photocopy/config.json";
@@ -31,10 +33,14 @@ public class Config {
   @JsonProperty("ejectAfterCopy")
   private boolean ejectEnabled;
 
-  public Config() throws IOException {
+  public Config() {
     File configFile = new File(DEFAULT_CONFIG_FILE);
     if (configFile.exists()) {
-      MAPPER.readerForUpdating(this).readValue(configFile);
+      try {
+        MAPPER.readerForUpdating(this).readValue(configFile);
+      } catch (IOException e) {
+        log.warn("Unable to load config file {}: {}", DEFAULT_CONFIG_FILE, e.getMessage());
+      }
     }
   }
 
