@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Main {
   public static void main(String[] args) throws Exception {
-    Config config = Config.load();
+    Config config = new Config();
 
     Path source = Path.of(args[0]);
     Path target = config.getTarget();

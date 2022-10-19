@@ -26,6 +26,7 @@ public class CopyProcessor {
     try (Stream<Path> files = Files.walk(source)) {
       files
           .filter(Files::isRegularFile)
+          .filter(Files::isReadable)
           .forEach(
               sourceFile -> {
                 Future<PhotoCopy> future =
@@ -47,11 +48,8 @@ public class CopyProcessor {
                             if (targetFile != null) {
                               photoCopy.doCopy(sourceFile, targetFile);
                             }
-                          } catch (ImageProcessingException e) {
-                            // ignore
                           } catch (Exception e) {
-                            System.err.println(sourceFile);
-                            e.printStackTrace();
+                            // ignore
                           }
                           return photoCopy;
                         });

@@ -22,7 +22,6 @@ public class Config {
   @JsonProperty("renameOnCopy")
   private String formatStr;
 
-  @JsonProperty private Path source;
   @JsonProperty private Path target;
   @JsonProperty private boolean openAfterCopy;
 
@@ -32,17 +31,20 @@ public class Config {
   @JsonProperty("ejectAfterCopy")
   private boolean ejectEnabled;
 
-  public static Config load() throws IOException {
+  public Config() throws IOException {
     File configFile = new File(DEFAULT_CONFIG_FILE);
     if (configFile.exists()) {
-      return MAPPER.readValue(configFile, Config.class);
-    } else {
-      return new Config();
+      MAPPER.readerForUpdating(this).readValue(configFile);
     }
   }
 
   @SneakyThrows
   public void save() {
-    MAPPER.writerWithDefaultPrettyPrinter().writeValue(new File(DEFAULT_CONFIG_FILE), this);
+    File configFile = new File(DEFAULT_CONFIG_FILE);
+    File parentFile = configFile.getParentFile();
+    if (!parentFile.exists()) {
+      parentFile.mkdirs();
+    }
+    MAPPER.writerWithDefaultPrettyPrinter().writeValue(configFile, this);
   }
 }

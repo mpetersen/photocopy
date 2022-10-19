@@ -6,6 +6,7 @@ import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.copy.CopyProcessor;
 import de.moritzpetersen.photocopy.copy.CopyStats;
 import de.moritzpetersen.photocopy.util.AppProperties;
+import de.moritzpetersen.photocopy.util.DeleteFileVisitor;
 import de.moritzpetersen.photocopy.volume.Volume;
 import de.moritzpetersen.photocopy.volume.VolumeService;
 import lombok.SneakyThrows;
@@ -19,11 +20,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
@@ -31,6 +29,8 @@ import java.util.function.Function;
 
 @Slf4j
 public class Main {
+  private static Collection<Volume> currentVolumes;
+
   public static void main(String[] args) throws Exception {
     System.setProperty("apple.awt.UIElement", "true");
     final String style =
@@ -40,15 +40,15 @@ public class Main {
     final AppProperties appProperties = new AppProperties();
     final LaunchAgentService launchAgentService = new LaunchAgentService(appProperties);
     final VolumeService volumeService = new VolumeService();
-    final Config config = Config.load();
+    final Config config = new Config();
 
     final TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(iconUrl));
     final PopupMenu trayMenu = new PopupMenu();
     trayMenu.addSeparator();
-    trayMenu.add(item("Target directory:"));
+    trayMenu.add(item("Target Directory:"));
     trayMenu.add(
         item(
-            config.getTarget().toString(),
+            config.getTarget() == null ? "Select…" : config.getTarget().toString(),
             e -> {
               int modifiers = e.getModifiers();
               if (modifiers != 0) {
@@ -71,18 +71,18 @@ public class Main {
             }));
     trayMenu.add(
         item(
-            "Open after copy",
+            "Open after Copy",
             config.isOpenAfterCopy(),
             e -> {
               config.setOpenAfterCopy(((MenuItem) e.getSource()).isEnabled());
               config.save();
             }));
     trayMenu.addSeparator();
-    trayMenu.add(item("Rename on copy:"));
+    trayMenu.add(item("Rename on Copy:"));
     trayMenu.add(
         item(
             config.getFormatStr(),
-            label -> label == null || label.length() == 0 ? "<inactive>" : label,
+            label -> label == null || label.length() == 0 ? "Set Format…" : label,
             e -> {
               String value = config.getFormatStr() == null ? "" : config.getFormatStr();
               String formatStr =
@@ -96,7 +96,7 @@ public class Main {
     trayMenu.addSeparator();
     trayMenu.add(
         item(
-            "Eject after copy",
+            "Eject after Copy",
             config.isEjectEnabled(),
             e -> {
               boolean ejectEnabled = ((CheckboxMenuItem) e.getSource()).isEnabled();
@@ -105,7 +105,7 @@ public class Main {
             }));
     trayMenu.add(
         item(
-            "Erase before copy",
+            "Erase before Copy",
             config.isEraseEnabled(),
             e -> {
               boolean eraseEnabled = ((CheckboxMenuItem) e.getSource()).isEnabled();
@@ -115,7 +115,7 @@ public class Main {
     trayMenu.addSeparator();
     trayMenu.add(
         item(
-            "Launch " + appProperties.getName() + " at login",
+            "Launch " + appProperties.getName() + " at Login",
             launchAgentService.isLaunchAtLogin(),
             e -> {
               boolean launchAtLogin = ((CheckboxMenuItem) e.getSource()).isEnabled();
@@ -134,63 +134,50 @@ public class Main {
         new MouseAdapter() {
           @Override
           public void mousePressed(MouseEvent e) {
-            while (trayMenu.getItemCount() > initialItemCount) {
-              trayMenu.remove(0);
-            }
             Collection<Volume> volumes = volumeService.externalVolumes();
-            for (Volume volume : volumes) {
-              trayMenu.insert(
-                  item(
-                      volume.getName(),
-                      ev -> {
-                        MenuItem item = (MenuItem) ev.getSource();
-                        Path target = config.getTarget();
-                        try {
-                          item.setEnabled(false);
-                          if (target == null) {
-                            log.info("Target not defined");
-                            return;
+            if (!volumes.equals(currentVolumes)) {
+              while (trayMenu.getItemCount() > initialItemCount) {
+                trayMenu.remove(0);
+              }
+              for (Volume volume : volumes) {
+                trayMenu.insert(
+                    item(
+                        volume.getName(),
+                        ev -> {
+                          MenuItem item = (MenuItem) ev.getSource();
+                          Path target = config.getTarget();
+                          try {
+                            if (target == null) {
+                              log.info("Target not defined");
+                              return;
+                            }
+                            item.setEnabled(false);
+                            if (config.isEraseEnabled() && Files.exists(target)) {
+                              Files.walkFileTree(target, new DeleteFileVisitor());
+                            }
+                            if (!Files.exists(target)) {
+                              Files.createDirectories(target);
+                            }
+                            CopyProcessor processor = new CopyProcessor();
+                            DateTimeFormatter formatter =
+                                DateTimeFormatter.ofPattern(config.getFormatStr());
+                            Path source = Path.of("/Volumes", volume.getName());
+                            processor.doCopy(source, target, new CopyStats(), formatter);
+                            if (config.isOpenAfterCopy()) {
+                              open(config.getTarget());
+                            }
+                            if (config.isEjectEnabled()) {
+                              volumeService.unmount(volume);
+                            }
+                          } catch (IOException | InterruptedException | ExecutionException ex) {
+                            throw new RuntimeException(ex);
+                          } finally {
+                            item.setEnabled(true);
                           }
-                          if (config.isEraseEnabled() && Files.exists(target)) {
-                            Files.walkFileTree(
-                                target,
-                                new SimpleFileVisitor<Path>() {
-                                  @Override
-                                  public FileVisitResult visitFile(
-                                      Path file, BasicFileAttributes attrs) throws IOException {
-                                    Files.delete(file);
-                                    return super.visitFile(file, attrs);
-                                  }
-
-                                  @Override
-                                  public FileVisitResult postVisitDirectory(
-                                      Path dir, IOException exc) throws IOException {
-                                    Files.delete(dir);
-                                    return super.postVisitDirectory(dir, exc);
-                                  }
-                                });
-                          }
-                          if (!Files.exists(target)) {
-                            Files.createDirectories(target);
-                          }
-                          CopyProcessor processor = new CopyProcessor();
-                          DateTimeFormatter formatter =
-                              DateTimeFormatter.ofPattern(config.getFormatStr());
-                          Path source = Path.of("/Volumes", volume.getName());
-                          processor.doCopy(source, target, new CopyStats(), formatter);
-                          if (config.isOpenAfterCopy()) {
-                            open(config.getTarget());
-                          }
-                          if (config.isEjectEnabled()) {
-                            volumeService.unmount(volume);
-                          }
-                        } catch (IOException | InterruptedException | ExecutionException ex) {
-                          throw new RuntimeException(ex);
-                        } finally {
-                          item.setEnabled(true);
-                        }
-                      }),
-                  0);
+                        }),
+                    0);
+              }
+              currentVolumes = volumes;
             }
           }
         });
@@ -220,7 +207,7 @@ public class Main {
     return item(label, Function.identity(), actionListener);
   }
 
-  private static MenuItem item(
+  private static <T> MenuItem item(
       String label, Function<String, String> labelFn, ActionListener actionListener) {
     MenuItem item =
         new MenuItem() {
@@ -240,4 +227,5 @@ public class Main {
     }
     return item;
   }
+
 }
