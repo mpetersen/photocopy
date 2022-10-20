@@ -93,7 +93,7 @@ public class CopyProcessor {
                           stats.addStats(photoCopy.getBytesCopied());
                           log.info("Done: " + sourceFile + " -> " + targetFile);
                         } catch (Exception e) {
-                          log.error("Copy failed: {}", sourceFile);
+                          log.error("Copy failed: {} ({})", sourceFile, e.getMessage());
                         }
                         return photoCopy;
                       });

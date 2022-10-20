@@ -28,7 +28,7 @@ public class Controller {
 
   public void onTargetDirectory(ActionEvent e) {
     int modifiers = e.getModifiers();
-    if (modifiers != 0) {
+    if (modifiers == 1) {
       open(config.getTarget());
     } else {
       System.setProperty("apple.awt.fileDialogForDirectories", "true");
@@ -73,55 +73,46 @@ public class Controller {
 
   public ActionListener onVolume(Volume volume) {
     return e -> {
-      if (e.getModifiers() != 0) {
+      if (e.getModifiers() == 1) {
         open(volume.toPath());
-        return;
+      } else {
+        final MenuItem item = (MenuItem) e.getSource();
+        final CopyStats copyStats =
+            new CopyStats() {
+              private int currentFile = 0;
+
+              @Override
+              public void setCount(long count) {
+                super.setCount(count);
+                updateLabel();
+              }
+
+              @Override
+              public void addStats(long bytesCopied) {
+                super.addStats(bytesCopied);
+                currentFile++;
+                updateLabel();
+              }
+
+              private void updateLabel() {
+                item.setLabel(volume.getName() + " (" + currentFile + "/" + getCount() + ")");
+              }
+            };
+        new Thread(
+                () -> {
+                  try {
+                    item.setEnabled(false);
+                    item.setLabel(volume.getName() + " (initializing…)");
+                    copyProcessor.doCopy(volume, config, copyStats);
+                  } catch (IOException | InterruptedException | ExecutionException ex) {
+                    throw new RuntimeException(ex);
+                  } finally {
+                    item.setLabel(volume.getName());
+                    item.setEnabled(true);
+                  }
+                })
+            .start();
       }
-      final MenuItem item = (MenuItem) e.getSource();
-      final CopyStats copyStats =
-          new CopyStats() {
-            private int currentFile = 0;
-
-            @Override
-            public void setCount(long count) {
-              super.setCount(count);
-              updateLabel();
-            }
-
-            @Override
-            public void addStats(long bytesCopied) {
-              super.addStats(bytesCopied);
-              currentFile++;
-              updateLabel();
-            }
-
-            private void updateLabel() {
-//              EventQueue.invokeLater(
-//                  () -> {
-                    item.setLabel(volume.getName() + " (" + currentFile + "/" + getCount() + ")");
-//                  });
-            }
-          };
-      new Thread(
-              () -> {
-                try {
-//                  EventQueue.invokeLater(
-//                      () -> {
-                        item.setEnabled(false);
-                        item.setLabel(volume.getName() + " (initializing…)");
-//                      });
-                  copyProcessor.doCopy(volume, config, copyStats);
-                } catch (IOException | InterruptedException | ExecutionException ex) {
-                  throw new RuntimeException(ex);
-                } finally {
-//                  EventQueue.invokeLater(
-//                      () -> {
-                        item.setLabel(volume.getName());
-                        item.setEnabled(true);
-//                      });
-                }
-              })
-          .run();
     };
   }
 }

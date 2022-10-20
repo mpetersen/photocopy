@@ -56,6 +56,7 @@ public class Main {
     trayMenu.add(
         item(
             "Eject after Copy",
+            'E',
             config.isEjectEnabled(),
             controller.onCheck(Config::setEjectEnabled)));
     trayMenu.addSeparator();
@@ -64,29 +65,33 @@ public class Main {
         item(
             config.getTarget(),
             ifEmpty("Select Target Directory…"),
+            'T',
             controller::onTargetDirectory));
     trayMenu.add(
         item(
             "Erase before Copy",
+            'X',
             config.isEraseEnabled(),
             controller.onCheck(Config::setEraseEnabled)));
     trayMenu.add(
         item(
             "Open after Copy",
+            'O',
             config.isOpenAfterCopy(),
             controller.onCheck(Config::setOpenAfterCopy)));
     trayMenu.addSeparator();
     trayMenu.add(item("Rename on Copy:"));
-    trayMenu.add(item(config.getFormatStr(), ifEmpty("Set Format…"), controller::onFormatStr));
+    trayMenu.add(item(config.getFormatStr(), ifEmpty("Set Format…"), 'R', controller::onFormatStr));
     trayMenu.addSeparator();
     trayMenu.addSeparator();
     trayMenu.add(
         item(
             "Launch " + appProperties.getName() + " at Login",
+            'L',
             launchAgentService.isLaunchAtLogin(),
             controller::onLaunchAtLogin));
     trayMenu.addSeparator();
-    trayMenu.add(item("Quit " + appProperties.getName(), e -> System.exit(0)));
+    trayMenu.add(item("Quit " + appProperties.getName(), 'Q', e -> System.exit(0)));
     final int initialItemCount = trayMenu.getItemCount();
 
     trayIcon.addMouseListener(
@@ -101,8 +106,9 @@ public class Main {
               if (volumes.size() == 0) {
                 trayMenu.insert(item("No device found"), 1);
               }
+              int i = 0;
               for (Volume volume : volumes) {
-                trayMenu.insert(item(volume.getName(), controller.onVolume(volume)), 1);
+                trayMenu.insert(item(volume.getName(), '1' + i++, controller.onVolume(volume)), 1);
               }
               currentVolumes = volumes;
             }
@@ -112,22 +118,23 @@ public class Main {
     SystemTray.getSystemTray().add(trayIcon);
   }
 
-  private static MenuItem item(String label, boolean isEnabled, ItemListener itemListener) {
+  private static MenuItem item(String label, int shortcut, boolean isEnabled, ItemListener itemListener) {
     CheckboxMenuItem item = new CheckboxMenuItem(label, isEnabled);
+    item.setShortcut(new MenuShortcut(shortcut));
     item.addItemListener(itemListener);
     return item;
   }
 
   private static MenuItem item(Object label) {
-    return item(label, null);
+    return item(label, -1, null);
   }
 
-  private static MenuItem item(Object label, ActionListener actionListener) {
-    return item(label, Function.identity(), actionListener);
+  private static MenuItem item(Object label, int shortcut, ActionListener actionListener) {
+    return item(label, Function.identity(), shortcut, actionListener);
   }
 
   private static MenuItem item(
-      Object label, Function<String, String> labelFn, ActionListener actionListener) {
+      Object label, Function<String, String> labelFn, int shortcut, ActionListener actionListener) {
     MenuItem item =
         new MenuItem() {
           @Override
@@ -136,6 +143,9 @@ public class Main {
           }
         };
     item.setLabel(label == null ? null : Objects.toString(label));
+    if (shortcut != -1) {
+      item.setShortcut(new MenuShortcut(shortcut));
+    }
     if (actionListener == null) {
       item.setEnabled(false);
     } else {
