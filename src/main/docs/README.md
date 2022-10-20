@@ -26,6 +26,12 @@ Create a configuration file in `~/.${project.artifactId}/config.json`. The file 
 | `eraseBeforeCopy` | If `true`then the target directory will be erased before copy. |
 | `ejectAfterCopy` | If `true` then the device is ejected after copy. Not supported on the command line. |
 
+With the configuration in place, the application can be executed with:
+
+```
+${project.artifactId} <path to source>
+```
+
 ### macOS application
 
 <img src="imgs/screen1.png" width="600">
