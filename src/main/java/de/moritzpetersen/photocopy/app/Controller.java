@@ -78,14 +78,12 @@ public class Controller {
         return;
       }
       final MenuItem item = (MenuItem) e.getSource();
-      final String originalLabel = item.getLabel();
-      item.setEnabled(false);
-      CopyStats copyStats =
+      final CopyStats copyStats =
           new CopyStats() {
             private int currentFile = 0;
 
             @Override
-            public void setCount(int count) {
+            public void setCount(long count) {
               super.setCount(count);
               updateLabel();
             }
@@ -98,18 +96,32 @@ public class Controller {
             }
 
             private void updateLabel() {
-              item.setLabel(originalLabel + " (" + currentFile + "/" + getCount() + ")");
+//              EventQueue.invokeLater(
+//                  () -> {
+                    item.setLabel(volume.getName() + " (" + currentFile + "/" + getCount() + ")");
+//                  });
             }
           };
-      try {
-        item.setLabel(originalLabel + " (initializing…)");
-        copyProcessor.doCopy(volume, config, new CopyStats());
-      } catch (IOException | InterruptedException | ExecutionException ex) {
-        throw new RuntimeException(ex);
-      } finally {
-        item.setLabel(originalLabel);
-        item.setEnabled(true);
-      }
+      new Thread(
+              () -> {
+                try {
+//                  EventQueue.invokeLater(
+//                      () -> {
+                        item.setEnabled(false);
+                        item.setLabel(volume.getName() + " (initializing…)");
+//                      });
+                  copyProcessor.doCopy(volume, config, copyStats);
+                } catch (IOException | InterruptedException | ExecutionException ex) {
+                  throw new RuntimeException(ex);
+                } finally {
+//                  EventQueue.invokeLater(
+//                      () -> {
+                        item.setLabel(volume.getName());
+                        item.setEnabled(true);
+//                      });
+                }
+              })
+          .run();
     };
   }
 }

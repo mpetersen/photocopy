@@ -2,7 +2,6 @@ package de.moritzpetersen.photocopy.app;
 
 import de.moritzpetersen.factory.Factory;
 import de.moritzpetersen.macos.LaunchAgentService;
-import de.moritzpetersen.macos.MacosUtils;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.util.AppProperties;
 import de.moritzpetersen.photocopy.volume.Volume;
@@ -36,7 +35,7 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    Factory.create(Main.class).run();
+    EventQueue.invokeLater(() -> Factory.create(Main.class).run());
   }
 
   @SneakyThrows
@@ -46,9 +45,10 @@ public class Main {
     final VolumeService volumeService = new VolumeService();
     //    final Config config = new Config();
 
-    final String style =
-        MacosUtils.isMacMenuBarDarkMode().map(isDarkMode -> isDarkMode ? "_dark" : "").orElse("");
-    final URL iconUrl = ClassLoader.getSystemResource("icons/menubar" + style + ".png");
+//    final String style =
+//        MacosUtils.isMacMenuBarDarkMode().map(isDarkMode -> isDarkMode ? "_dark" : "").orElse("");
+//    final URL iconUrl = ClassLoader.getSystemResource("icons/menubar" + style + ".png");
+    final URL iconUrl = ClassLoader.getSystemResource("icons/menubar.png");
 
     final TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(iconUrl));
     final PopupMenu trayMenu = new PopupMenu();
@@ -114,7 +114,7 @@ public class Main {
 
   private static MenuItem item(String label, boolean isEnabled, ItemListener itemListener) {
     CheckboxMenuItem item = new CheckboxMenuItem(label, isEnabled);
-    item.addItemListener(e -> EventQueue.invokeLater(() -> itemListener.itemStateChanged(e)));
+    item.addItemListener(itemListener);
     return item;
   }
 
@@ -139,7 +139,12 @@ public class Main {
     if (actionListener == null) {
       item.setEnabled(false);
     } else {
-      item.addActionListener(e -> EventQueue.invokeLater(() -> actionListener.actionPerformed(e)));
+      item.addActionListener(
+          e ->
+              new Thread(
+                  () -> {
+                    actionListener.actionPerformed(e);
+                  }).run());
     }
     return item;
   }

@@ -8,7 +8,7 @@ public class CopyStats {
   @Getter
   private long bytesCopied = 0;
   @Getter @Setter
-  private int count;
+  private long count;
   private final long start = System.currentTimeMillis();
   private long finish = -1;
 
