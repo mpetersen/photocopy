@@ -1,5 +1,9 @@
 # Photocopy
 
+Photocopy is an application that helps you with your photography workflow. It copies photos from your SD card and renames them on the fly.
+
+My usual workflow was that I imported photos directly in Adobe Lightroom (Classic), then renamed photos by their capture date. Now I switched to Lightroom Desktop, which does not have a rename feature. I can still rename photos, when they are synched with Lightroom Classic, but I want to skip that step. Photocopy helps me with that. It renames the photos, copies them to my hard drive and also ejects the SD card after copy.
+
 ## Usage
 
 Photocopy can be used either as a command line application or as a macOS application in the menubar. 
@@ -18,13 +22,13 @@ Create a configuration file in `~/.photocopy/config.json`. The file needs to hav
 }
 ```
 
-| Field    | Description                         |
-|----------|-------------------------------------|
-| `target` | The path of the target directory.   |
-| `openAfterCopy` | If `true` then the target directory will be opened after copy. |
-| `renameOnCopy` | The format string to rename the file on copy. Needs to be compatible with a Java date format pattern. |
-| `eraseBeforeCopy` | If `true`then the target directory will be erased before copy. |
-| `ejectAfterCopy` | If `true` then the device is ejected after copy. Not supported on the command line. |
+| Field    | Description                                                                                                                                                           |
+|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `target` | The path of the target directory.                                                                                                                                     |
+| `openAfterCopy` | If `true` then the target directory will be opened after copy.                                                                                                        |
+| `renameOnCopy` | The format string to rename the file on copy. Needs to be compatible with a Java date format pattern. The date used to rename files is the capture date of the photo. |
+| `eraseBeforeCopy` | If `true`then the target directory will be erased before copy.                                                                                                        |
+| `ejectAfterCopy` | If `true` then the device is ejected after copy. Not supported on the command line.                                                                                   |
 
 With the configuration in place, the application can be executed with:
 
