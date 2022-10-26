@@ -17,9 +17,11 @@ all: build install
 
 install:
 	ln -sF $(proj)/bin/run.sh /usr/local/bin/$(name)
+	mv -n target/*.app /Applications
 
 build:
 	mvn clean install
+	codesign --force --deep --sign - target/*.app
 
 uninstall:
 	unlink /usr/local/bin/$(name)
