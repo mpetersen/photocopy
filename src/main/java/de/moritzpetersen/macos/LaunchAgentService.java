@@ -2,9 +2,7 @@ package de.moritzpetersen.macos;
 
 import de.moritzpetersen.photocopy.util.AppProperties;
 import lombok.SneakyThrows;
-import org.apache.commons.io.IOUtils;
 
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,9 +24,7 @@ public class LaunchAgentService {
   @SneakyThrows
   public void setLaunchAtLogin(boolean launchAtLogin) {
     if (launchAtLogin) {
-      final String data =
-          IOUtils.toString(
-              ClassLoader.getSystemResourceAsStream("LaunchAgent.plist"), Charset.defaultCharset());
+      final String data = new String(ClassLoader.getSystemResourceAsStream("LaunchAgent.plist").readAllBytes());
       final String replaced = data.replace("$USER_DIR", System.getProperty("user.dir"));
       Files.writeString(launchAgentFile, replaced);
     } else {
