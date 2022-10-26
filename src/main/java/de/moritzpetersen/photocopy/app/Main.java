@@ -52,7 +52,7 @@ public class Main {
 
     final TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(iconUrl));
     final PopupMenu trayMenu = new PopupMenu();
-    trayMenu.add(item("Copy from:"));
+    trayMenu.add(item("Copy from (hold down ⇧ to open):"));
     trayMenu.add(
         item(
             "Eject after Copy",
@@ -60,7 +60,7 @@ public class Main {
             config.isEjectEnabled(),
             controller.onCheck(Config::setEjectEnabled)));
     trayMenu.addSeparator();
-    trayMenu.add(item("Target Directory:"));
+    trayMenu.add(item("Target Directory (hold down ⇧ to open):"));
     trayMenu.add(
         item(
             config.getTarget(),
@@ -82,7 +82,6 @@ public class Main {
     trayMenu.addSeparator();
     trayMenu.add(item("Rename on Copy:"));
     trayMenu.add(item(config.getFormatStr(), ifEmpty("Set Format…"), 'R', controller::onFormatStr));
-    trayMenu.addSeparator();
     trayMenu.addSeparator();
     trayMenu.add(
         item(
