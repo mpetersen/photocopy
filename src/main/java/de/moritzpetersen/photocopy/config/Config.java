@@ -3,20 +3,18 @@ package de.moritzpetersen.photocopy.config;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.moritzpetersen.photocopy.util.JsonFile;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Slf4j
-public class Config {
+public class Config extends JsonFile {
   private static final String DEFAULT_CONFIG_FILE =
       System.getenv("HOME") + "/.photocopy/config.json";
   private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -33,24 +31,9 @@ public class Config {
   @JsonProperty("ejectAfterCopy")
   private boolean ejectEnabled;
 
-  public Config() {
-    File configFile = new File(DEFAULT_CONFIG_FILE);
-    if (configFile.exists()) {
-      try {
-        MAPPER.readerForUpdating(this).readValue(configFile);
-      } catch (IOException e) {
-        log.warn("Unable to load config file {}: {}", DEFAULT_CONFIG_FILE, e.getMessage());
-      }
-    }
-  }
+  @JsonProperty private boolean avoidDuplicates;
 
-  @SneakyThrows
-  public void save() {
-    File configFile = new File(DEFAULT_CONFIG_FILE);
-    File parentFile = configFile.getParentFile();
-    if (!parentFile.exists()) {
-      parentFile.mkdirs();
-    }
-    MAPPER.writerWithDefaultPrettyPrinter().writeValue(configFile, this);
+  public Config() {
+    super(Path.of(DEFAULT_CONFIG_FILE));
   }
 }

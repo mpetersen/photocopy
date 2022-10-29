@@ -53,6 +53,7 @@ public class Main {
     final TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(iconUrl));
     final PopupMenu trayMenu = new PopupMenu();
     trayMenu.add(item("Copy from (hold down ⇧ to open):"));
+    trayMenu.add(item("Avoid Duplicates", 'D', config.isAvoidDuplicates(), controller.onCheck(Config::setAvoidDuplicates)));
     trayMenu.add(
         item(
             "Eject after Copy",
