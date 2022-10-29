@@ -18,7 +18,8 @@ Create a configuration file in `~/.${project.artifactId}/config.json`. The file 
   "openAfterCopy" : true,
   "renameOnCopy" : "'IMG'_yyyy-MM-dd_HH-mm-ss",
   "eraseBeforeCopy" : true,
-  "ejectAfterCopy" : true
+  "ejectAfterCopy" : true,
+  "avoidDuplicates" : true
 }
 ```
 
@@ -29,6 +30,7 @@ Create a configuration file in `~/.${project.artifactId}/config.json`. The file 
 | `renameOnCopy` | The format string to rename the file on copy. Needs to be compatible with a Java date format pattern. The date used to rename files is the capture date of the photo. |
 | `eraseBeforeCopy` | If `true`then the target directory will be erased before copy.                                                                                                        |
 | `ejectAfterCopy` | If `true` then the device is ejected after copy. Not supported on the command line.                                                                                   |
+| `avoidDuplicates` | If `true` then duplicates are not copied, even if they don't exist in the target directory, but have been copied before. The duplicates are tracked in a JSON file (`photocopy.json`), which is placed in the source directory. |
 
 With the configuration in place, the application can be executed with:
 
