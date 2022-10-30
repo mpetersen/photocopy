@@ -56,7 +56,7 @@ Add the following dependency:
 <dependency>
     <groupId>de.moritzpetersen</groupId>
     <artifactId>photocopy</artifactId>
-    <version>1.1</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 
@@ -83,9 +83,6 @@ The makefile will build and compile the application (`make build`) and also inst
 
 The `target` directory will also contain a macOS application `target/Photocopy.app`.
 
-You may need to sign the application in order to run properly (especially on Apple Silicon machines). You can use
-the `bin/sign.sh` script:
+### Self signing
 
-```
-bin/sign.sh target/Photocopy.app
-```
+In order to run properly on your machine (especially on an Apple Silicone Mac), you need to self sign the application. `make build` already does this for you.

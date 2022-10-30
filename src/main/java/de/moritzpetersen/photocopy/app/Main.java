@@ -31,6 +31,7 @@ public class Main {
   @Inject private Config config;
 
   static {
+    // Hide dock icon
     System.setProperty("apple.awt.UIElement", "true");
   }
 
@@ -154,7 +155,7 @@ public class Main {
               new Thread(
                   () -> {
                     actionListener.actionPerformed(e);
-                  }).run());
+                  }).start());
     }
     return item;
   }

@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 @Slf4j
 public class CopyProcessor {
@@ -139,8 +140,8 @@ public class CopyProcessor {
         consumer.accept(input);
       }
       if (Files.isDirectory(input)) {
-        try {
-          Files.list(input).forEach( path -> walk(path, consumer));
+        try (Stream<Path> list = Files.list(input)) {
+          list.forEach(path -> walk(path, consumer));
         } catch (IOException e) {
           log.error("Unable to process {} ({})", input, e.getMessage());
         }
