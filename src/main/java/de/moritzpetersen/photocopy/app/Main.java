@@ -46,15 +46,21 @@ public class Main {
     final VolumeService volumeService = new VolumeService();
     //    final Config config = new Config();
 
-//    final String style =
-//        MacosUtils.isMacMenuBarDarkMode().map(isDarkMode -> isDarkMode ? "_dark" : "").orElse("");
-//    final URL iconUrl = ClassLoader.getSystemResource("icons/menubar" + style + ".png");
+    //    final String style =
+    //        MacosUtils.isMacMenuBarDarkMode().map(isDarkMode -> isDarkMode ? "_dark" :
+    // "").orElse("");
+    //    final URL iconUrl = ClassLoader.getSystemResource("icons/menubar" + style + ".png");
     final URL iconUrl = ClassLoader.getSystemResource("icons/menubar.png");
 
     final TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(iconUrl));
     final PopupMenu trayMenu = new PopupMenu();
     trayMenu.add(item("Copy from (hold down ⇧ to open):"));
-    trayMenu.add(item("Avoid Duplicates", 'D', config.isAvoidDuplicates(), controller.onCheck(Config::setAvoidDuplicates)));
+    trayMenu.add(
+        item(
+            "Avoid Duplicates",
+            'D',
+            config.isAvoidDuplicates(),
+            controller.onCheck(Config::setAvoidDuplicates)));
     trayMenu.add(
         item(
             "Eject after Copy",
@@ -94,23 +100,15 @@ public class Main {
     trayMenu.addSeparator();
     trayMenu.add(item("Quit " + appProperties.getName(), 'Q', e -> System.exit(0)));
     final int initialItemCount = trayMenu.getItemCount();
+    updateVolumes(currentVolumes, trayMenu, initialItemCount);
 
     trayIcon.addMouseListener(
         new MouseAdapter() {
           @Override
           public void mousePressed(MouseEvent e) {
             Collection<Volume> volumes = volumeService.externalVolumes();
-            if (!volumes.equals(currentVolumes)) {
-              while (trayMenu.getItemCount() > initialItemCount) {
-                trayMenu.remove(1);
-              }
-              if (volumes.size() == 0) {
-                trayMenu.insert(item("No device found"), 1);
-              }
-              int i = 0;
-              for (Volume volume : volumes) {
-                trayMenu.insert(item(volume.getName(), '1' + i++, controller.onVolume(volume)), 1);
-              }
+            if (hasChanged(volumes)) {
+              updateVolumes(volumes, trayMenu, initialItemCount);
               currentVolumes = volumes;
             }
           }
@@ -119,7 +117,35 @@ public class Main {
     SystemTray.getSystemTray().add(trayIcon);
   }
 
-  private static MenuItem item(String label, int shortcut, boolean isEnabled, ItemListener itemListener) {
+  private void updateVolumes(Collection<Volume> volumes, PopupMenu trayMenu, int initialItemCount) {
+    while (trayMenu.getItemCount() > initialItemCount) {
+      trayMenu.remove(1);
+    }
+    if (volumes == null || volumes.size() == 0) {
+      trayMenu.insert(item("No device found"), 1);
+    } else {
+      int i = 0;
+      for (Volume volume : volumes) {
+        trayMenu.insert(item(volume.getName(), '1' + i++, controller.onVolume(volume)), 1);
+      }
+    }
+  }
+
+  private static boolean hasChanged(Collection<Volume> newVolumes) {
+    final boolean bothAreEmpty = isEmpty(newVolumes) && isEmpty(currentVolumes);
+    if (!bothAreEmpty) {
+      return !newVolumes.equals(currentVolumes);
+    } else {
+      return false;
+    }
+  }
+
+  private static boolean isEmpty(Collection<Volume> newVolumes) {
+    return newVolumes == null || newVolumes.size() == 0;
+  }
+
+  private static MenuItem item(
+      String label, int shortcut, boolean isEnabled, ItemListener itemListener) {
     CheckboxMenuItem item = new CheckboxMenuItem(label, isEnabled);
     item.setShortcut(new MenuShortcut(shortcut));
     item.addItemListener(itemListener);
@@ -153,9 +179,10 @@ public class Main {
       item.addActionListener(
           e ->
               new Thread(
-                  () -> {
-                    actionListener.actionPerformed(e);
-                  }).start());
+                      () -> {
+                        actionListener.actionPerformed(e);
+                      })
+                  .start());
     }
     return item;
   }
