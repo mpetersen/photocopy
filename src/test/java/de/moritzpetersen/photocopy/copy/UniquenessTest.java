@@ -1,30 +1,31 @@
 package de.moritzpetersen.photocopy.copy;
 
-import de.moritzpetersen.photocopy.version.VersionedPath;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+import de.moritzpetersen.photocopy.version.VersionedPath;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class UniquenessTest {
   private Uniqueness uniqueness;
 
   @BeforeEach
   void reset() throws IOException {
-    Files.list(base())
-        .forEach(
-            path -> {
-              try {
-                Files.deleteIfExists(path);
-              } catch (IOException e) {
-                throw new RuntimeException(e);
-              }
-            });
+    if (Files.exists(base())){
+      Files.list(base())
+          .forEach(
+              path -> {
+                try {
+                  Files.deleteIfExists(path);
+                } catch (IOException e) {
+                  throw new RuntimeException(e);
+                }
+              });
+    }
     uniqueness = new Uniqueness();
   }
 
