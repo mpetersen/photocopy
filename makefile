@@ -16,12 +16,12 @@ name = $(shell basename $(proj))
 all: build install
 
 install:
-	ln -sF $(proj)/bin/run.sh /usr/local/bin/$(name)
-	mv -n target/*.app /Applications
+	sudo ln -sF $(proj)/bin/run.sh /usr/local/bin/$(name)
+	sudo mv -n target/*.app /Applications
 
 build:
 	mvn clean install
-	codesign --force --deep --sign - target/*.app
+	sudo codesign --force --deep --sign - target/*.app
 
 uninstall:
-	unlink /usr/local/bin/$(name)
+	sudo unlink /usr/local/bin/$(name)

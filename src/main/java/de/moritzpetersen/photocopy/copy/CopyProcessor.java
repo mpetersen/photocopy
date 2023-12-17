@@ -82,49 +82,50 @@ public class CopyProcessor {
 
     stats.setCount(counter.getCount());
 
-    ExecutorService threadPool =
-        Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    Set<Future<PhotoCopy>> futures = new HashSet<>();
-    Uniqueness uniqueness = new Uniqueness();
-    walk(
-        source,
-        sourceFile -> {
-          if (!(avoidDuplicates && copyLog.exists(sourceFile))) {
-            Future<PhotoCopy> future =
-                threadPool.submit(
-                    () -> {
-                      PhotoCopy photoCopy = new PhotoCopy();
-                      try {
-                        PhotoMetadata metadata = new PhotoMetadata(sourceFile);
-                        VersionedPath versionedPath =
-                            new VersionedPath(target.resolve(sourceFile.getFileName()));
-                        LocalDateTime dateTime = metadata.getDateTime();
-                        String name = dateTime.format(formatter);
-                        versionedPath.setName(name);
+    try (ExecutorService threadPool =
+        Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
+      Set<Future<PhotoCopy>> futures = new HashSet<>();
+      Uniqueness uniqueness = new Uniqueness();
+      walk(
+          source,
+          sourceFile -> {
+            if (!(avoidDuplicates && copyLog.exists(sourceFile))) {
+              Future<PhotoCopy> future =
+                  threadPool.submit(
+                      () -> {
+                        PhotoCopy photoCopy = new PhotoCopy();
+                        try {
+                          PhotoMetadata metadata = new PhotoMetadata(sourceFile);
+                          VersionedPath versionedPath =
+                              new VersionedPath(target.resolve(sourceFile.getFileName()));
+                          LocalDateTime dateTime = metadata.getDateTime();
+                          String name = dateTime.format(formatter);
+                          versionedPath.setName(name);
 
-                        Path targetFile =
-                            uniqueness.toPath(versionedPath, new SizeComparator(sourceFile));
+                          Path targetFile =
+                              uniqueness.toPath(versionedPath, new SizeComparator(sourceFile));
 
-                        if (targetFile != null) {
-                          photoCopy.doCopy(sourceFile, targetFile);
+                          if (targetFile != null) {
+                            photoCopy.doCopy(sourceFile, targetFile);
+                            log.info("{}", target.relativize(targetFile));
+                          }
+                          copyLog.register(sourceFile);
+                          stats.addStats(photoCopy.getBytesCopied());
+                        } catch (Exception e) {
+                          log.error("Copy failed: {} ({})", sourceFile, e.getMessage());
                         }
-                        copyLog.register(sourceFile);
-                        stats.addStats(photoCopy.getBytesCopied());
-                        log.info("Done: " + sourceFile + " -> " + targetFile);
-                      } catch (Exception e) {
-                        log.error("Copy failed: {} ({})", sourceFile, e.getMessage());
-                      }
-                      return photoCopy;
-                    });
-            futures.add(future);
-          }
-        });
-    for (Future<PhotoCopy> future : futures) {
-      PhotoCopy photoCopy = future.get();
+                        return photoCopy;
+                      });
+              futures.add(future);
+            }
+          });
+      for (Future<PhotoCopy> future : futures) {
+        PhotoCopy photoCopy = future.get();
+      }
+      threadPool.shutdown();
+      copyLog.save();
+      stats.done();
     }
-    threadPool.shutdown();
-    copyLog.save();
-    stats.done();
   }
 
   /**
