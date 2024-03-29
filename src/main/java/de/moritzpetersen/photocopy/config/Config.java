@@ -2,13 +2,12 @@ package de.moritzpetersen.photocopy.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.moritzpetersen.photocopy.util.JsonFile;
+import java.nio.file.Path;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.file.Path;
 
 @Getter
 @Setter
@@ -17,7 +16,6 @@ import java.nio.file.Path;
 public class Config extends JsonFile {
   private static final String DEFAULT_CONFIG_FILE =
       System.getenv("HOME") + "/.photocopy/config.json";
-  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   @JsonProperty("renameOnCopy")
   private String formatStr;
@@ -32,6 +30,11 @@ public class Config extends JsonFile {
   private boolean ejectEnabled;
 
   @JsonProperty private boolean avoidDuplicates;
+
+  @JsonProperty private boolean importOnDrop;
+
+  @JsonProperty private boolean importKnownLocations;
+  @JsonProperty private Set<Path> knownLocations;
 
   public Config() {
     super(Path.of(DEFAULT_CONFIG_FILE));
