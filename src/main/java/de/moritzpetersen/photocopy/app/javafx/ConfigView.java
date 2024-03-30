@@ -26,12 +26,12 @@ public class ConfigView extends GridPane {
     setHgap(8);
     setVgap(14);
 
+    addTextField("Rename on copy:", config::getFormatStr, config::setFormatStr);
     TextField target =
         addTextField("Target:", config::getTarget, str -> config.setTarget(Path.of(str)));
     DragAndDrop.enableDrop(target, file -> target.setText(file.toAbsolutePath().toString()));
-    addTextField("Rename on copy:", config::getFormatStr, config::setFormatStr);
-    addRadioButton("Open after copy", config::isOpenAfterCopy, config::setOpenAfterCopy);
-    addRadioButton("Erase before copy", config::isEraseEnabled, config::setEjectEnabled);
+    addRadioButton("Erase target before copy", config::isEraseEnabled, config::setEjectEnabled);
+    addRadioButton("Open target after copy", config::isOpenAfterCopy, config::setOpenAfterCopy);
     addRadioButton("Avoid duplicates", config::isAvoidDuplicates, config::setAvoidDuplicates);
     addRadioButton("Eject after copy", config::isEjectEnabled, config::setEjectEnabled);
     addRadioButton("Auto-import on drop", config::isImportOnDrop, config::setImportOnDrop);
@@ -78,7 +78,9 @@ public class ConfigView extends GridPane {
   }
 
   private TextField addTextField(
-      String label, Supplier<Object> valueProvider, Consumer<String> updateHandler) {
+      String label,
+      Supplier<Object> valueProvider,
+      Consumer<String> updateHandler) {
     TextField node = new TextField(Objects.toString(valueProvider.get(), ""));
     node.setPrefWidth(300);
 

@@ -82,6 +82,14 @@
           <mainClass>${project.groupId}.${project.artifactId}.app.javafx.Main</mainClass>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.gluonhq</groupId>
+        <artifactId>gluonfx-maven-plugin</artifactId>
+        <version>1.0.22</version>
+        <configuration>
+          <mainClass>de.moritzpetersen.photocopy.app.javafx.Main</mainClass>
+        </configuration>
+      </plugin>
     </plugins>
     <resources>
       <resource>

@@ -2,7 +2,6 @@ package de.moritzpetersen.photocopy.app.javafx;
 
 import static de.moritzpetersen.photocopy.util.LambdaUtils.*;
 
-import atlantafx.base.theme.NordDark;
 import de.moritzpetersen.factory.Factory;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.copy.CopyProcessor;
@@ -33,7 +32,9 @@ public class Main extends Application {
 
   @Override
   public void start(Stage stage) throws Exception {
-    Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
+//    Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
+
+//    Application.setUserAgentStylesheet(ClassLoader.getSystemResource("css/modena_dark.css").toExternalForm());
 
     FileListView fileListView = new FileListView();
     ConfigView configView = new ConfigView();
