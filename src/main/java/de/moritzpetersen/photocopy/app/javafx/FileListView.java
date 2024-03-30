@@ -3,47 +3,58 @@ package de.moritzpetersen.photocopy.app.javafx;
 import static de.moritzpetersen.photocopy.util.LambdaUtils.*;
 import static de.moritzpetersen.photocopy.util.LambdaUtils.runLater;
 
+import de.moritzpetersen.factory.Factory;
 import de.moritzpetersen.photocopy.app.javafx.model.FileObject;
-import java.io.File;
+import de.moritzpetersen.photocopy.config.Config;
+import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.input.Dragboard;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.ListView;
+import lombok.Getter;
 
-public class FileListView extends TableView<FileObject> {
+@Getter
+public class FileListView extends ListView<FileObject> {
+  private Path sourceDir;
+  private EventHandler<ActionEvent> eventHandler;
+
   public FileListView() {
-    TableColumn<FileObject, String> nameColumn = new TableColumn<>("Name");
-    nameColumn.setCellValueFactory(param -> param.getValue().nameProperty());
-    TableColumn<FileObject, Boolean> validColumn = new TableColumn<>("Valid");
-    validColumn.setCellValueFactory(param -> param.getValue().validProperty());
-    validColumn.setCellFactory(column -> new CheckBoxTableCell<>());
-    TableColumn<FileObject, Boolean> importedColumn = new TableColumn<>("Imported");
-    importedColumn.setCellValueFactory(param -> param.getValue().importedProperty());
-    importedColumn.setCellFactory(column -> new CheckBoxTableCell<>());
-    getColumns().addAll(nameColumn, validColumn, importedColumn);
+    DragAndDrop.enableDrop(
+        this,
+        droppedDir -> {
+          Config config = Factory.inject(Config.class);
 
-    setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+          this.sourceDir = droppedDir;
 
-    DragAndDrop.enableDrop(this,
-        event -> {
           ObservableList<FileObject> items = getItems();
           runLater(items::clear);
-          Dragboard dragboard = event.getDragboard();
-          List<File> files = dragboard.getFiles();
 
           runAsync(
-              () ->
-                  files.stream()
-                      .map(File::toPath)
-                      .flatMap(sneaky(Files::walk))
+              () -> {
+                try (Stream<Path> files = Files.walk(droppedDir)) {
+                  files
                       .filter(Files::isRegularFile)
                       .map(FileObject::new)
-                      .forEach(runLater(items::add)));
+                      .filter(FileObject::isValid)
+                      .forEach(runLater(items::add));
+                } catch (IOException e) {
+                  throw new RuntimeException(e);
+                }
+              });
 
-          event.consume();
+          if (config.isImportOnDrop()) {
+            runAsync(
+                () -> {
+                  eventHandler.handle(new ActionEvent());
+                });
+          }
         });
+  }
+
+  public void setOnAction(EventHandler<ActionEvent> eventHandler) {
+    this.eventHandler = eventHandler;
   }
 }

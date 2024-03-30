@@ -35,6 +35,7 @@ public class Config extends JsonFile {
 
   @JsonProperty private boolean importKnownLocations;
   @JsonProperty private Set<Path> knownLocations;
+  @JsonProperty private boolean quitAfterImport;
 
   public Config() {
     super(Path.of(DEFAULT_CONFIG_FILE));

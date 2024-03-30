@@ -4,36 +4,26 @@ import com.drew.imaging.ImageProcessingException;
 import de.moritzpetersen.photocopy.metadata.PhotoMetadata;
 import java.io.IOException;
 import java.nio.file.Path;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 public class FileObject {
-  private StringProperty name;
-  private BooleanProperty valid;
-  private BooleanProperty imported;
+  private PhotoMetadata metadata;
+  private String name;
 
   public FileObject(Path path) {
-    name = new SimpleStringProperty(this, "name", path.getFileName().toString());
+    name = path.getFileName().toString();
     try {
-      PhotoMetadata metadata = new PhotoMetadata(path);
-      valid = new SimpleBooleanProperty(this, "valid", true);
+      metadata = new PhotoMetadata(path);
     } catch (IOException | ImageProcessingException | NullPointerException e) {
-      valid = new SimpleBooleanProperty(this, "valid", false);
+      // ignore;
     }
-    imported = new SimpleBooleanProperty(false);
   }
 
-  public StringProperty nameProperty() {
+  public boolean isValid() {
+    return metadata != null;
+  }
+
+  @Override
+  public String toString() {
     return name;
-  }
-
-  public BooleanProperty validProperty() {
-    return valid;
-  }
-
-  public BooleanProperty importedProperty() {
-    return imported;
   }
 }

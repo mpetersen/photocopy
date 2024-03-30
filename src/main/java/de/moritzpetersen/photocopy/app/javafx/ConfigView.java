@@ -2,9 +2,7 @@ package de.moritzpetersen.photocopy.app.javafx;
 
 import de.moritzpetersen.factory.Factory;
 import de.moritzpetersen.photocopy.config.Config;
-import java.io.File;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -30,17 +28,7 @@ public class ConfigView extends GridPane {
 
     TextField target =
         addTextField("Target:", config::getTarget, str -> config.setTarget(Path.of(str)));
-    DragAndDrop.enableDrop(
-        target,
-        event -> {
-          List<File> files = event.getDragboard().getFiles();
-          if (files.size() == 1) {
-            File file = files.get(0);
-            if (file.isDirectory()) {
-              target.setText(file.getAbsolutePath());
-            }
-          }
-        });
+    DragAndDrop.enableDrop(target, file -> target.setText(file.toAbsolutePath().toString()));
     addTextField("Rename on copy:", config::getFormatStr, config::setFormatStr);
     addRadioButton("Open after copy", config::isOpenAfterCopy, config::setOpenAfterCopy);
     addRadioButton("Erase before copy", config::isEraseEnabled, config::setEjectEnabled);
@@ -52,6 +40,7 @@ public class ConfigView extends GridPane {
         config::isImportKnownLocations,
         config::setImportKnownLocations);
     addButton("Clear known locations", () -> config.setKnownLocations(null));
+    addRadioButton("Quit after import", config::isQuitAfterImport, config::setQuitAfterImport);
 
     addEventHandler(ConfigUpdateEvent.CONFIG, event -> config.save());
   }
@@ -59,9 +48,10 @@ public class ConfigView extends GridPane {
   private void addButton(String label, Runnable actionHandler) {
     Button node = new Button(label);
 
-    node.setOnAction(event -> {
-      actionHandler.run();
-    });
+    node.setOnAction(
+        event -> {
+          actionHandler.run();
+        });
 
     addDoubleColumnSpan(node);
   }
