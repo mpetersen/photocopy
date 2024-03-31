@@ -13,7 +13,7 @@
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <javafx.version>23-ea+3</javafx.version>
-      <lombok.version>1.18.30</lombok.version>
+    <lombok.version>1.18.30</lombok.version>
   </properties>
   <repositories>
     <repository>
@@ -96,7 +96,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-            <mainClass>de.moritzpetersen.photocopy.app.javafx.Main</mainClass>
+          <mainClass>de.moritzpetersen.photocopy.app.javafx.Main</mainClass>
         </configuration>
       </plugin>
       <plugin>
@@ -125,6 +125,16 @@
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
       <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.violetlib</groupId>
+      <artifactId>vaqua</artifactId>
+      <version>12</version>
+    </dependency>
+    <dependency>
+      <groupId>org.freeplane.bulenkov</groupId>
+      <artifactId>darcula</artifactId>
+      <version>2021.7</version>
     </dependency>
     <dependency>
       <groupId>io.github.mkpaz</groupId>
