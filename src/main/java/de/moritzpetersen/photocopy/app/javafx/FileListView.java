@@ -1,11 +1,12 @@
 package de.moritzpetersen.photocopy.app.javafx;
 
 import static de.moritzpetersen.photocopy.util.LambdaUtils.*;
-import static de.moritzpetersen.photocopy.util.LambdaUtils.runLater;
+import static de.moritzpetersen.photocopy.util.LambdaUtils.updateJavaFX;
 
 import de.moritzpetersen.factory.Factory;
 import de.moritzpetersen.photocopy.app.javafx.model.FileObject;
 import de.moritzpetersen.photocopy.config.Config;
+import de.moritzpetersen.photocopy.util.LambdaUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +31,7 @@ public class FileListView extends ListView<FileObject> {
           this.sourceDir = droppedDir;
 
           ObservableList<FileObject> items = getItems();
-          runLater(items::clear);
+          updateJavaFX(items::clear);
 
           runAsync(
               () -> {
@@ -39,7 +40,7 @@ public class FileListView extends ListView<FileObject> {
                       .filter(Files::isRegularFile)
                       .map(FileObject::new)
                       .filter(FileObject::isValid)
-                      .forEach(runLater(items::add));
+                      .forEach(LambdaUtils.updateJavaFX(items::add));
                 } catch (IOException e) {
                   throw new RuntimeException(e);
                 }

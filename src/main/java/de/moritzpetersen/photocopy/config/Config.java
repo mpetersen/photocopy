@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.moritzpetersen.photocopy.util.JsonFile;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +35,7 @@ public class Config extends JsonFile {
   @JsonProperty private boolean importOnDrop;
 
   @JsonProperty private boolean importKnownLocations;
-  @JsonProperty private Set<Path> knownLocations;
+  @JsonProperty private Set<Path> knownLocations = new HashSet<>();
   @JsonProperty private boolean quitAfterImport;
 
   public Config() {

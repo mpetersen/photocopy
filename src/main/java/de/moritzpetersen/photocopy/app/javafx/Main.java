@@ -32,9 +32,10 @@ public class Main extends Application {
 
   @Override
   public void start(Stage stage) throws Exception {
-//    Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
+    //    Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
 
-//    Application.setUserAgentStylesheet(ClassLoader.getSystemResource("css/modena_dark.css").toExternalForm());
+    //
+    // Application.setUserAgentStylesheet(ClassLoader.getSystemResource("css/modena_dark.css").toExternalForm());
 
     FileListView fileListView = new FileListView();
     ConfigView configView = new ConfigView();
@@ -42,48 +43,49 @@ public class Main extends Application {
     Button importButton = new Button("Run PhotoCopy");
     ProgressBar importProgress = new ProgressBar(0);
 
-    EventHandler<ActionEvent> runPhotoCopy = event -> {
-      Config config = Factory.inject(Config.class);
-      CopyProcessor copyProcessor = Factory.inject(CopyProcessor.class);
+    EventHandler<ActionEvent> runPhotoCopy =
+        event -> {
+          Config config = Factory.inject(Config.class);
+          CopyProcessor copyProcessor = Factory.inject(CopyProcessor.class);
 
-      CopyStats stats =
-          new CopyStats() {
-            private int counter = 0;
+          CopyStats stats =
+              new CopyStats() {
+                private int counter = 0;
 
-            @Override
-            public void addStats(long bytesCopied) {
-              super.addStats(bytesCopied);
-              counter++;
-              double progress = (double) counter / fileListView.getItems().size();
-              runLater(() -> importProgress.setProgress(progress));
+                @Override
+                public void addStats(long bytesCopied) {
+                  super.addStats(bytesCopied);
+                  counter++;
+                  double progress = (double) counter / fileListView.getItems().size();
+                  updateJavaFX(() -> importProgress.setProgress(progress));
+                }
+              };
+
+          Path sourceDir = fileListView.getSourceDir();
+          Volume sourceVolume = Volume.of(sourceDir);
+
+          if (!config.getKnownLocations().contains(sourceDir)) {
+            config.getKnownLocations().add(sourceDir);
+            config.save();
+          }
+
+          try {
+            if (sourceVolume != null) {
+              sourceVolume.addEjectFailedListener(
+                  b -> {
+                    System.out.println("Eject failed: " + sourceVolume);
+                  });
+              copyProcessor.doCopy(sourceVolume, config, stats);
+            } else {
+              copyProcessor.doCopy(sourceDir, config, stats);
             }
-          };
-
-      Path sourceDir = fileListView.getSourceDir();
-      Volume sourceVolume = Volume.of(sourceDir);
-
-      if (!config.getKnownLocations().contains(sourceDir)) {
-        config.getKnownLocations().add(sourceDir);
-        config.save();
-      }
-
-      try {
-        if (sourceVolume != null) {
-          sourceVolume.addEjectFailedListener(
-              b -> {
-                System.out.println("Eject failed: " + sourceVolume);
-              });
-          copyProcessor.doCopy(sourceVolume, config, stats);
-        } else {
-          copyProcessor.doCopy(sourceDir, config, stats);
-        }
-        if (config.isQuitAfterImport()) {
-          System.exit(0);
-        }
-      } catch (IOException | ExecutionException | InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-    };
+            if (config.isQuitAfterImport()) {
+              System.exit(0);
+            }
+          } catch (IOException | ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+        };
 
     importButton.setOnAction(runPhotoCopy);
     fileListView.setOnAction(runPhotoCopy);

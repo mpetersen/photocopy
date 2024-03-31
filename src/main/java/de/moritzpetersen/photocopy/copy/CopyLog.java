@@ -2,9 +2,6 @@ package de.moritzpetersen.photocopy.copy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.moritzpetersen.photocopy.util.JsonFile;
-import lombok.*;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CopyLog extends JsonFile {
@@ -20,7 +19,7 @@ public class CopyLog extends JsonFile {
   @JsonIgnore
   private Path base;
 
-  protected CopyLog(Path base) {
+  public CopyLog(Path base) {
     super(base.resolve("photocopy.json"));
     this.base = base;
     if (entryMap == null) {
