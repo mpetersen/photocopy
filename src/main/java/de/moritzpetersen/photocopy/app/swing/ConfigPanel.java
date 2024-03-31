@@ -14,9 +14,9 @@ import javax.swing.*;
 
 public class ConfigPanel extends JPanel {
   private final Runnable configHandler;
-  private static final Grid GRID = new Grid(2, 10, 20, 8, 14);
-  private static final Grid.Constraints FIRST_COLUMN = GRID.getConstraints(0, 1);
-  private static final Grid.Constraints SECOND_COLUMN = GRID.getConstraints(1, 1);
+  private static final Grid GRID = new Grid(2, 10, 0, 8, 14);
+  private static final Grid.Constraints FIRST_COLUMN = GRID.getConstraints(0);
+  private static final Grid.Constraints SECOND_COLUMN = GRID.getConstraints(1);
   private static final Grid.Constraints FIRST_AND_SECOND_COLUMN = GRID.getConstraints(0, 2);
   private int rowIndex = 0;
 
@@ -50,7 +50,6 @@ public class ConfigPanel extends JPanel {
 
   private void addButton(String label, Runnable actionHandler) {
     JButton button = new JButton(label);
-    //    button.putClientProperty("JButton.buttonType", "roundRect");
 
     button.addActionListener(
         event -> {
@@ -58,7 +57,7 @@ public class ConfigPanel extends JPanel {
           configHandler.run();
         });
 
-    add(button, FIRST_AND_SECOND_COLUMN.atRow(rowIndex++));
+    add(button, FIRST_AND_SECOND_COLUMN.get());
   }
 
   private void addRadioButton(
@@ -71,7 +70,7 @@ public class ConfigPanel extends JPanel {
           configHandler.run();
         });
 
-    add(radioButton, FIRST_AND_SECOND_COLUMN.atRow(rowIndex++));
+    add(radioButton, FIRST_AND_SECOND_COLUMN.get());
   }
 
   private JTextField addTextField(
@@ -88,8 +87,8 @@ public class ConfigPanel extends JPanel {
           }
         });
 
-    add(new JLabel(label), FIRST_COLUMN.atRow(rowIndex));
-    add(textField, SECOND_COLUMN.atRow(rowIndex++));
+    add(new JLabel(label), FIRST_COLUMN.get());
+    add(textField, SECOND_COLUMN.get());
 
     return textField;
   }

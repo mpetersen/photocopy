@@ -7,10 +7,20 @@ import lombok.NonNull;
 
 public class LambdaUtils {
 
-  public static <U, V> Function<U, V> sneaky(ThrowingFunction<U, V> fn) {
+  public static <T, R> Function<T, R> sneaky(ThrowingFunction<T, R> fn) {
     return value -> {
       try {
         return fn.apply(value);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    };
+  }
+
+  public static <T> Consumer<T> sneaky(ThrowingConsumer<T> consumer) {
+    return value -> {
+      try {
+        consumer.accept(value);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
@@ -33,5 +43,10 @@ public class LambdaUtils {
   @FunctionalInterface
   public interface ThrowingFunction<T, R> {
     R apply(T value) throws Exception;
+  }
+
+  @FunctionalInterface
+  public interface ThrowingConsumer<T> {
+    void accept(T value) throws Exception;
   }
 }
