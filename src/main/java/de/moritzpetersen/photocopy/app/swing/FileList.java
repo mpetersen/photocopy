@@ -3,14 +3,12 @@ package de.moritzpetersen.photocopy.app.swing;
 import static de.moritzpetersen.factory.Factory.inject;
 import static de.moritzpetersen.photocopy.util.LambdaUtils.*;
 
-import com.drew.imaging.ImageProcessingException;
 import de.moritzpetersen.photocopy.app.javafx.DragAndDrop;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.copy.CopyLog;
 import de.moritzpetersen.photocopy.metadata.PhotoMetadata;
+import de.moritzpetersen.photocopy.util.FileUtils;
 import java.awt.*;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -35,7 +33,7 @@ public class FileList extends JPanel {
 
     setLayout(new BorderLayout());
     add(title, BorderLayout.PAGE_START);
-    add(list, BorderLayout.CENTER);
+    add(new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
   }
 
   public int getItemCount() {
@@ -50,19 +48,28 @@ public class FileList extends JPanel {
     DefaultListModel<FileListItem> model = (DefaultListModel<FileListItem>) list.getModel();
     updateSwing(
         () -> {
-          title.setText(basePath.toAbsolutePath().toString());
+          title.setText(basePath.toAbsolutePath() + ":");
           model.removeAllElements();
         });
 
     runAsync(
         () ->
-            sneaky(() -> Files.walk(basePath))
-                .parallel()
-                .filter(Files::isRegularFile)
-                .filter(file -> copyLog == null || !copyLog.exists(file))
-                .map(FileListItem::new)
-                .filter(FileListItem::isValid)
-                .forEach(updateSwing(model::addElement)));
+            FileUtils.safeWalk(basePath, path -> {
+              if (copyLog == null || !copyLog.exists(path)) {
+                FileListItem item = new FileListItem(path);
+                if (item.isValid()) {
+                  updateSwing(() -> model.addElement(item));
+                }
+              }
+            }));
+//
+//            sneaky(() -> Files.walk(basePath))
+//                .parallel()
+//                .filter(Files::isRegularFile)
+//                .filter(file -> copyLog == null || !copyLog.exists(file))
+//                .map(FileListItem::new)
+//                .filter(FileListItem::isValid)
+//                .forEach(updateSwing(model::addElement)));
   }
 
   public static class FileListItem {
@@ -75,7 +82,7 @@ public class FileList extends JPanel {
       try {
         new PhotoMetadata(path);
         isValid = true;
-      } catch (IOException | ImageProcessingException e) {
+      } catch (Exception e) {
         isValid = false;
       }
       this.isValid = isValid;

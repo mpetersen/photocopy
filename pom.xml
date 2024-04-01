@@ -53,7 +53,7 @@
           <plist>
             <CFBundleIconFile>artwork/icon.icns</CFBundleIconFile>
             <CFBundleDisplayName>${project.name}</CFBundleDisplayName>
-            <JVMMainClassName>${project.groupId}.${project.artifactId}.app.javafx.Main</JVMMainClassName>
+            <JVMMainClassName>${project.groupId}.${project.artifactId}.app.swing.Main</JVMMainClassName>
             <JVMVersion>19+</JVMVersion>
             <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
           </plist>
@@ -80,7 +80,7 @@
               <archive>
                 <manifest>
                   <mainClass>
-                    ${project.groupId}.${project.artifactId}.Main
+                    ${project.groupId}.${project.artifactId}.app.swing.Main
                   </mainClass>
                 </manifest>
               </archive>

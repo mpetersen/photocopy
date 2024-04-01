@@ -80,12 +80,7 @@ public class MainWindow extends JFrame {
     controlPanel.add(importButton, c2.get());
     controlPanel.add(importProgress, c3.get());
 
-    add(
-        new JScrollPane(
-            fileList,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
-        BorderLayout.CENTER);
+    add(fileList, BorderLayout.CENTER);
     add(controlPanel, BorderLayout.LINE_END);
 
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

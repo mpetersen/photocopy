@@ -3,17 +3,15 @@ package de.moritzpetersen.photocopy.copy;
 import de.moritzpetersen.macos.MacosUtils;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.util.DeleteFileVisitor;
+import de.moritzpetersen.photocopy.util.FileUtils;
 import de.moritzpetersen.photocopy.volume.Volume;
 import de.moritzpetersen.photocopy.volume.VolumeService;
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +67,7 @@ public class CopyProcessor {
 
     FileCounter counter = new FileCounter();
 
-    walk(source, counter);
+    FileUtils.safeWalk(source, counter);
 
     stats.setCount(counter.getCount());
 
@@ -117,27 +115,5 @@ public class CopyProcessor {
 //      copyLog.save();
 //      stats.done();
 //    }
-  }
-
-  /**
-   * In order to handle exceptions properly, this method has to be used instead of
-   * {@link Files#walk(Path, FileVisitOption...)} or {@link Files#walkFileTree(Path, FileVisitor)}
-   *
-   * @param input The base path.
-   * @param consumer The consumer that is applied on every file.
-   */
-  private void walk(Path input, Consumer<Path> consumer) {
-    if (Files.isReadable(input)) {
-      if (Files.isRegularFile(input)) {
-        consumer.accept(input);
-      }
-      if (Files.isDirectory(input)) {
-        try (Stream<Path> list = Files.list(input)) {
-          list.forEach(path -> walk(path, consumer));
-        } catch (IOException e) {
-          log.error("Unable to process {} ({})", input, e.getMessage());
-        }
-      }
-    }
   }
 }
