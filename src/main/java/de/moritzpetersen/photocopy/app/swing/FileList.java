@@ -1,9 +1,9 @@
 package de.moritzpetersen.photocopy.app.swing;
 
+import static de.moritzpetersen.factory.Factory.inject;
 import static de.moritzpetersen.photocopy.util.LambdaUtils.*;
 
 import com.drew.imaging.ImageProcessingException;
-import de.moritzpetersen.factory.Factory;
 import de.moritzpetersen.photocopy.app.javafx.DragAndDrop;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.copy.CopyLog;
@@ -16,19 +16,30 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 
-public class FileList extends JList<FileList.FileListItem> {
-  private final Config config;
+public class FileList extends JPanel {
+  private static final EmptyBorder BORDER = new EmptyBorder(6, 4, 6, 4);
+  private final Config config = inject(Config.class);
+  private final JList<FileListItem> list = new JList<>(new DefaultListModel<>());
+  private final JLabel title = new JLabel("Drop source directory here.");
   @Getter private Path basePath;
 
   public FileList() {
-    super(new DefaultListModel<>());
-    setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    setSelectionModel(new NoSelectionModel());
-    setCellRenderer(new Renderer());
+    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    list.setSelectionModel(new NoSelectionModel());
+    list.setCellRenderer(new Renderer());
+    DragAndDrop.enableDrop(list, this::setBasePath);
 
-    config = Factory.getInstance(Config.class);
+    Font font = title.getFont();
+    title.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
+    title.setBorder(BORDER);
 
-    DragAndDrop.enableDrop(this, this::setBasePath);
+    setLayout(new BorderLayout());
+    add(title, BorderLayout.PAGE_START);
+    add(list, BorderLayout.CENTER);
+  }
+
+  public int getItemCount() {
+    return list.getModel().getSize();
   }
 
   public void setBasePath(Path basePath) {
@@ -36,8 +47,12 @@ public class FileList extends JList<FileList.FileListItem> {
 
     CopyLog copyLog = config.isAvoidDuplicates() ? new CopyLog(basePath) : null;
 
-    DefaultListModel<FileListItem> model = (DefaultListModel<FileListItem>) getModel();
-    updateSwing(model::removeAllElements);
+    DefaultListModel<FileListItem> model = (DefaultListModel<FileListItem>) list.getModel();
+    updateSwing(
+        () -> {
+          title.setText(basePath.toAbsolutePath().toString());
+          model.removeAllElements();
+        });
 
     runAsync(
         () ->
@@ -82,10 +97,10 @@ public class FileList extends JList<FileList.FileListItem> {
       JComponent component =
           (JComponent)
               super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-      if (index % 2 == 0) {
+      if (index % 2 == 1) {
         component.setBackground(ALT_ROW_COLOR);
       }
-      component.setBorder(new EmptyBorder(6, 4, 6, 4));
+      component.setBorder(BORDER);
       return component;
     }
   }

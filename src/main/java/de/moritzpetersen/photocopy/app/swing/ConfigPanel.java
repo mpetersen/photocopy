@@ -1,6 +1,7 @@
 package de.moritzpetersen.photocopy.app.swing;
 
-import de.moritzpetersen.factory.Factory;
+import static de.moritzpetersen.factory.Factory.inject;
+
 import de.moritzpetersen.photocopy.app.javafx.DragAndDrop;
 import de.moritzpetersen.photocopy.config.Config;
 import java.awt.*;
@@ -13,7 +14,7 @@ import java.util.function.Supplier;
 import javax.swing.*;
 
 public class ConfigPanel extends JPanel {
-  private final Runnable configHandler;
+  private final Config config = inject(Config.class);
   private static final Grid GRID = new Grid(2, 10, 0, 8, 14);
   private static final Grid.Constraints FIRST_COLUMN = GRID.getConstraints(0);
   private static final Grid.Constraints SECOND_COLUMN = GRID.getConstraints(1);
@@ -23,9 +24,6 @@ public class ConfigPanel extends JPanel {
   public ConfigPanel() {
     super(new GridBagLayout());
 
-    Config config = Factory.getInstance(Config.class);
-    configHandler = config::save;
-
     addTextField("Rename on copy:", config::getFormatStr, config::setFormatStr);
     JTextField target =
         addTextField("Target:", config::getTarget, str -> config.setTarget(Path.of(str)));
@@ -33,7 +31,7 @@ public class ConfigPanel extends JPanel {
         target,
         file -> {
           target.setText(file.toAbsolutePath().toString());
-          configHandler.run();
+          config.save();
         });
     addRadioButton("Erase target before copy", config::isEraseEnabled, config::setEjectEnabled);
     addRadioButton("Open target after copy", config::isOpenAfterCopy, config::setOpenAfterCopy);
@@ -54,7 +52,7 @@ public class ConfigPanel extends JPanel {
     button.addActionListener(
         event -> {
           actionHandler.run();
-          configHandler.run();
+          config.save();
         });
 
     add(button, FIRST_AND_SECOND_COLUMN.get());
@@ -67,7 +65,7 @@ public class ConfigPanel extends JPanel {
     radioButton.addActionListener(
         event -> {
           updateHandler.accept(radioButton.isSelected());
-          configHandler.run();
+          config.save();
         });
 
     add(radioButton, FIRST_AND_SECOND_COLUMN.get());
@@ -83,7 +81,7 @@ public class ConfigPanel extends JPanel {
           @Override
           public void keyTyped(KeyEvent e) {
             updateHandler.accept(textField.getText());
-            configHandler.run();
+            config.save();
           }
         });
 
