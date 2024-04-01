@@ -10,6 +10,7 @@ import de.moritzpetersen.photocopy.metadata.PhotoMetadata;
 import de.moritzpetersen.photocopy.util.FileUtils;
 import java.awt.*;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
@@ -20,12 +21,18 @@ public class FileList extends JPanel {
   private final JList<FileListItem> list = new JList<>(new DefaultListModel<>());
   private final JLabel title = new JLabel("Drop source directory here.");
   @Getter private Path basePath;
+  private Consumer<Path> onDropConsumer;
 
   public FileList() {
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.setSelectionModel(new NoSelectionModel());
     list.setCellRenderer(new Renderer());
-    DragAndDrop.enableDrop(list, this::setBasePath);
+    DragAndDrop.enableDrop(
+        list,
+        dir -> {
+          setBasePath(dir);
+          runAsync(() -> onDropConsumer.accept(dir));
+        });
 
     Font font = title.getFont();
     title.setFont(new Font(font.getName(), Font.BOLD, font.getSize()));
@@ -33,7 +40,10 @@ public class FileList extends JPanel {
 
     setLayout(new BorderLayout());
     add(title, BorderLayout.PAGE_START);
-    add(new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
+    add(
+        new JScrollPane(
+            list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER),
+        BorderLayout.CENTER);
   }
 
   public int getItemCount() {
@@ -54,22 +64,20 @@ public class FileList extends JPanel {
 
     runAsync(
         () ->
-            FileUtils.safeWalk(basePath, path -> {
-              if (copyLog == null || !copyLog.exists(path)) {
-                FileListItem item = new FileListItem(path);
-                if (item.isValid()) {
-                  updateSwing(() -> model.addElement(item));
-                }
-              }
-            }));
-//
-//            sneaky(() -> Files.walk(basePath))
-//                .parallel()
-//                .filter(Files::isRegularFile)
-//                .filter(file -> copyLog == null || !copyLog.exists(file))
-//                .map(FileListItem::new)
-//                .filter(FileListItem::isValid)
-//                .forEach(updateSwing(model::addElement)));
+            FileUtils.safeWalk(
+                basePath,
+                path -> {
+                  if (copyLog == null || !copyLog.exists(path)) {
+                    FileListItem item = new FileListItem(path);
+                    if (item.isValid()) {
+                      updateSwing(() -> model.addElement(item));
+                    }
+                  }
+                }));
+  }
+
+  public void setOnDrop(Consumer<Path> onDropConsumer) {
+    this.onDropConsumer = onDropConsumer;
   }
 
   public static class FileListItem {
