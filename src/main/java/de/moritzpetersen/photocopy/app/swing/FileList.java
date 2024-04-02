@@ -3,7 +3,9 @@ package de.moritzpetersen.photocopy.app.swing;
 import static de.moritzpetersen.factory.Factory.inject;
 import static de.moritzpetersen.photocopy.util.LambdaUtils.*;
 
-import de.moritzpetersen.photocopy.app.javafx.DragAndDrop;
+import de.moritzpetersen.photocopy.app.DragAndDrop;
+import de.moritzpetersen.photocopy.app.fileList.AlternatingRowCellRenderer;
+import de.moritzpetersen.photocopy.app.fileList.NoSelectionModel;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.copy.CopyLog;
 import de.moritzpetersen.photocopy.metadata.PhotoMetadata;
@@ -26,7 +28,7 @@ public class FileList extends JPanel {
   public FileList() {
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.setSelectionModel(new NoSelectionModel());
-    list.setCellRenderer(new Renderer());
+    list.setCellRenderer(new AlternatingRowCellRenderer());
     DragAndDrop.enableDrop(
         list,
         dir -> {
@@ -102,35 +104,4 @@ public class FileList extends JPanel {
     }
   }
 
-  private static class Renderer extends DefaultListCellRenderer {
-
-    public static final Color ALT_ROW_COLOR = UIManager.getColor("PhotoCopy.list.alternateRow");
-
-    @Override
-    public Component getListCellRendererComponent(
-        JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-      JComponent component =
-          (JComponent)
-              super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-      if (index % 2 == 1) {
-        component.setBackground(ALT_ROW_COLOR);
-      }
-      component.setBorder(BORDER);
-      return component;
-    }
-  }
-
-  private static class NoSelectionModel extends DefaultListSelectionModel {
-    @Override
-    public void setAnchorSelectionIndex(int anchorIndex) {}
-
-    @Override
-    public void setLeadAnchorNotificationEnabled(boolean flag) {}
-
-    @Override
-    public void setLeadSelectionIndex(int leadIndex) {}
-
-    @Override
-    public void setSelectionInterval(int index0, int index1) {}
-  }
 }

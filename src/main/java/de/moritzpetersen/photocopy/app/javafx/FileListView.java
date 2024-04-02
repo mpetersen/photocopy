@@ -4,6 +4,7 @@ import static de.moritzpetersen.photocopy.util.LambdaUtils.*;
 import static de.moritzpetersen.photocopy.util.LambdaUtils.updateJavaFX;
 
 import de.moritzpetersen.factory.Factory;
+import de.moritzpetersen.photocopy.app.DragAndDrop;
 import de.moritzpetersen.photocopy.app.javafx.model.FileObject;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.util.LambdaUtils;

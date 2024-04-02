@@ -1,6 +1,7 @@
 package de.moritzpetersen.photocopy.app.javafx;
 
 import de.moritzpetersen.factory.Factory;
+import de.moritzpetersen.photocopy.app.DragAndDrop;
 import de.moritzpetersen.photocopy.config.Config;
 import java.nio.file.Path;
 import java.util.Objects;

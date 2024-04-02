@@ -1,4 +1,4 @@
-package de.moritzpetersen.photocopy.app.javafx;
+package de.moritzpetersen.photocopy.app;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;

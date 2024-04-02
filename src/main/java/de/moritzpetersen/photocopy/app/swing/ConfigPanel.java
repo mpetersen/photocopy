@@ -2,7 +2,7 @@ package de.moritzpetersen.photocopy.app.swing;
 
 import static de.moritzpetersen.factory.Factory.inject;
 
-import de.moritzpetersen.photocopy.app.javafx.DragAndDrop;
+import de.moritzpetersen.photocopy.app.DragAndDrop;
 import de.moritzpetersen.photocopy.config.Config;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
