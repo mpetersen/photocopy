@@ -1,14 +1,14 @@
 package de.moritzpetersen.photocopy.app.fileList;
 
 import java.awt.*;
-import java.nio.file.Path;
 import javax.swing.*;
+import lombok.Getter;
 
 public class FileList extends JPanel {
-  private Path basePath;
+  @Getter private final DefaultListModel<FileListItem> model = new DefaultListModel<>();
 
   public FileList() {
-    JList<FileListItem> list = new JList<>();
+    JList<FileListItem> list = new JList<>(model);
     list.setCellRenderer(new AlternatingRowCellRenderer());
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.setSelectionModel(new NoSelectionModel());
@@ -22,9 +22,5 @@ public class FileList extends JPanel {
     add(
         scrollPane,
         BorderLayout.CENTER);
-  }
-
-  public void setBasePath(Path basePath) {
-    this.basePath = basePath;
   }
 }

@@ -7,7 +7,6 @@ import javax.swing.*;
 import lombok.NonNull;
 
 public class LambdaUtils {
-
   public static <T, R> Function<T, R> sneaky(ThrowingFunction<T, R> fn) {
     return value -> {
       try {

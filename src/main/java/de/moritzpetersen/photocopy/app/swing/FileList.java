@@ -9,7 +9,6 @@ import de.moritzpetersen.photocopy.app.fileList.NoSelectionModel;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.copy.CopyLog;
 import de.moritzpetersen.photocopy.metadata.PhotoMetadata;
-import de.moritzpetersen.photocopy.util.FileUtils;
 import java.awt.*;
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -64,18 +63,18 @@ public class FileList extends JPanel {
           model.removeAllElements();
         });
 
-    runAsync(
-        () ->
-            FileUtils.safeWalk(
-                basePath,
-                path -> {
-                  if (copyLog == null || !copyLog.exists(path)) {
-                    FileListItem item = new FileListItem(path);
-                    if (item.isValid()) {
-                      updateSwing(() -> model.addElement(item));
-                    }
-                  }
-                }));
+//    runAsync(
+//        () ->
+//            FileExecutor.safeWalk(
+//                basePath,
+//                path -> {
+//                  if (copyLog == null || !copyLog.exists(path)) {
+//                    FileListItem item = new FileListItem(path);
+//                    if (item.isValid()) {
+//                      updateSwing(() -> model.addElement(item));
+//                    }
+//                  }
+//                }));
   }
 
   public void setOnDrop(Consumer<Path> onDropConsumer) {

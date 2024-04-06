@@ -1,11 +1,10 @@
 package de.moritzpetersen.photocopy.copy;
 
-import lombok.Getter;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import lombok.Getter;
 
 public class PhotoCopy {
 
@@ -19,6 +18,7 @@ public class PhotoCopy {
         Files.createDirectories(parent);
       }
       Files.copy(sourceFile, targetFile, StandardCopyOption.COPY_ATTRIBUTES);
+      Files.setLastModifiedTime(targetFile, Files.getLastModifiedTime(sourceFile));
       bytesCopied = Files.size(targetFile);
     }
   }
