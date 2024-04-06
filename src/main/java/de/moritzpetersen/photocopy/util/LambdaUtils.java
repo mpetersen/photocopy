@@ -2,9 +2,7 @@ package de.moritzpetersen.photocopy.util;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
-import javafx.application.Platform;
 import javax.swing.*;
-import lombok.NonNull;
 
 public class LambdaUtils {
   public static <T, R> Function<T, R> sneaky(ThrowingFunction<T, R> fn) {
@@ -37,15 +35,6 @@ public class LambdaUtils {
 
   public static void runAsync(Runnable runnable) {
     new Thread(runnable).start();
-  }
-
-  @NonNull
-  public static <T> Consumer<T> updateJavaFX(Consumer<T> consumer) {
-    return value -> Platform.runLater(() -> consumer.accept(value));
-  }
-
-  public static void updateJavaFX(Runnable runnable) {
-    Platform.runLater(runnable);
   }
 
   public static <T> Consumer<T> updateSwing(Consumer<T> consumer) {

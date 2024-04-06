@@ -10,6 +10,7 @@ import de.moritzpetersen.photocopy.copy.CopyExecutor;
 import de.moritzpetersen.photocopy.copy.CopyStats;
 import de.moritzpetersen.photocopy.util.FileExecutor;
 import de.moritzpetersen.photocopy.util.FileProcessor;
+import de.moritzpetersen.util.swing.DragAndDrop;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
