@@ -39,18 +39,19 @@ public class Main {
     mainWindow.setVisible(true);
 
     config.getKnownLocations().stream()
-        .filter(Files::exists)
-        .filter(Files::isReadable)
-        .findFirst()
-        .ifPresent(
-            path -> {
-              Collection<FileProcessor> processors = new ArrayList<>();
-              processors.add(new FileListUpdater());
-              if (config.isImportKnownLocations()) {
-                processors.add(new CopyExecutor(config, new CopyStats()));
-              }
-              fileExecutor.safeWalk(path, processors);
-            });
+          .peek(System.out::println)
+          .filter(Files::exists)
+          .filter(Files::isReadable)
+          .findFirst()
+          .ifPresent(
+              path -> {
+                Collection<FileProcessor> processors = new ArrayList<>();
+                processors.add(new FileListUpdater());
+                if (config.isImportKnownLocations()) {
+                  processors.add(new CopyExecutor(config, new CopyStats()));
+                }
+                fileExecutor.safeWalk(path, processors);
+              });
 
     DragAndDrop.enableDrop(
         mainWindow.getDropComponent(),
@@ -68,7 +69,9 @@ public class Main {
     mainWindow.setOnAction(
         () -> {
           Path path = mainWindow.getBasePath();
-          fileExecutor.safeWalk(path, List.of(new CopyExecutor(config, new CopyStats())));
+          if (path != null) {
+            fileExecutor.safeWalk(path, List.of(new CopyExecutor(config, new CopyStats())));
+          }
         });
   }
 

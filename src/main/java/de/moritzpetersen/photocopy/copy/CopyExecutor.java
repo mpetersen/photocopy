@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -72,6 +73,12 @@ public class CopyExecutor implements FileProcessor {
   @Override
   public void shutdown(Path path) {
     copyLog.save();
+
+    Set<Path> knownLocations = config.getKnownLocations();
+    if (!knownLocations.contains(path)) {
+      knownLocations.add(path);
+      config.save();
+    }
 
     if (config.isEjectEnabled()) {
       Volume volume = Volume.of(path);
