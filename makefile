@@ -17,7 +17,7 @@ all: build install
 
 install:
 	sudo ln -sF $(proj)/bin/run.sh /usr/local/bin/$(name)
-	sudo mv target/*.app /Applications
+	sudo mv -nv target/*.app /Applications
 
 build:
 	mvn clean install
