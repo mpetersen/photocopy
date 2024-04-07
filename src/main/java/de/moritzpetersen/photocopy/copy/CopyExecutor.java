@@ -36,22 +36,25 @@ public class CopyExecutor implements FileProcessor {
     if (!(config.isAvoidDuplicates() && copyLog.exists(sourceFile))) {
       PhotoCopy photoCopy = new PhotoCopy();
       try {
+        Path targetFile = config.getTarget().resolve(sourceFile.getFileName());
+
+        photoCopy.doCopy(sourceFile, targetFile);
+        log.info("{}", config.getTarget().relativize(targetFile));
+
+        VersionedPath versionedPath = new VersionedPath(targetFile);
         PhotoMetadata metadata = new PhotoMetadata(sourceFile);
-        VersionedPath versionedPath = new VersionedPath(config.getTarget().resolve(sourceFile.getFileName()));
         LocalDateTime dateTime = metadata.getDateTime();
         String name = dateTime.format(formatter);
         versionedPath.setName(name);
-
-        Path targetFile = uniqueness.toPath(versionedPath, new SizeComparator(sourceFile));
-
-        if (targetFile != null) {
-          photoCopy.doCopy(sourceFile, targetFile);
-          log.info("{}", config.getTarget().relativize(targetFile));
+        Path formattedUniquePath = uniqueness.toPath(versionedPath, new SizeComparator(sourceFile));
+        if (formattedUniquePath != null) {
+          Files.move(targetFile, formattedUniquePath);
         }
+
         copyLog.register(sourceFile);
         stats.addStats(photoCopy.getBytesCopied());
       } catch (Exception e) {
-        log.error("Copy failed: {} ({})", sourceFile, e.getMessage());
+        log.error("Error while copying: {} ({})", sourceFile, e.getMessage());
       }
     }
   }
@@ -82,7 +85,7 @@ public class CopyExecutor implements FileProcessor {
 
     if (config.isEjectEnabled()) {
       Volume volume = Volume.of(path);
-      if (volume != null){
+      if (volume != null) {
         VolumeService volumeService = new VolumeService();
         volumeService.unmount(volume);
       }

@@ -1,15 +1,12 @@
 package de.moritzpetersen.photocopy.copy;
 
 import de.moritzpetersen.photocopy.version.VersionedPath;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Uniqueness {
-  private VersionedPath versionedPath;
-
   private final Set<Path> pathInstances = new HashSet<>();
 
   public Path toPath(VersionedPath versionedPath, FileComparator... fileComparators) {
