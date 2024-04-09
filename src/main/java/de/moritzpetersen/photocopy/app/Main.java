@@ -2,11 +2,11 @@ package de.moritzpetersen.photocopy.app;
 
 import static de.moritzpetersen.photocopy.util.LambdaUtils.runAsync;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import de.moritzpetersen.factory.Factory;
+import de.moritzpetersen.macos.MacosUtils;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.copy.CopyExecutor;
 import de.moritzpetersen.photocopy.copy.CopyStats;
@@ -27,10 +27,18 @@ public class Main {
 
   public static void main(String[] args) {
     System.setProperty("apple.laf.useScreenMenuBar", "true");
-    System.setProperty("apple.awt.application.appearance", "system");
     System.setProperty("apple.awt.application.name", "PhotoCopy");
     FlatLaf.registerCustomDefaultsSource("de.moritzpetersen.themes");
-    FlatMacDarkLaf.setup();
+
+    if (MacosUtils.isMacMenuBarDarkMode().orElse(true)) {
+      // dark mode
+      System.setProperty("apple.awt.application.appearance", "system");
+      FlatMacDarkLaf.setup();
+    } else {
+      // light mode
+      FlatMacLightLaf.setup();
+    }
+
 
     Factory.create(Main.class).run(args);
   }
@@ -41,19 +49,19 @@ public class Main {
     mainWindow.setVisible(true);
 
     config.getKnownLocations().stream()
-          .peek(System.out::println)
-          .filter(Files::exists)
-          .filter(Files::isReadable)
-          .findFirst()
-          .ifPresent(
-              path -> {
-                Collection<FileProcessor> processors = new ArrayList<>();
-                processors.add(new FileListUpdater());
-                if (config.isImportKnownLocations()) {
-                  processors.add(new CopyExecutor(config, new CopyStats()));
-                }
-                fileExecutor.safeWalk(path, processors);
-              });
+        .peek(System.out::println)
+        .filter(Files::exists)
+        .filter(Files::isReadable)
+        .findFirst()
+        .ifPresent(
+            path -> {
+              Collection<FileProcessor> processors = new ArrayList<>();
+              processors.add(new FileListUpdater());
+              if (config.isImportKnownLocations()) {
+                processors.add(new CopyExecutor(config, new CopyStats()));
+              }
+              fileExecutor.safeWalk(path, processors);
+            });
 
     DragAndDrop.enableDrop(
         mainWindow.getDropComponent(),
