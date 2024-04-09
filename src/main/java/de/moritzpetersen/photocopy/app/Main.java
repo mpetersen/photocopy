@@ -27,7 +27,7 @@ public class Main {
 
   public static void main(String[] args) {
     System.setProperty("apple.laf.useScreenMenuBar", "true");
-    System.setProperty("apple.awt.application.name", "PhotoCopy");
+    System.setProperty("apple.awt.application.name", "Photocopy");
     FlatLaf.registerCustomDefaultsSource("de.moritzpetersen.themes");
 
     if (MacosUtils.isMacMenuBarDarkMode().orElse(true)) {

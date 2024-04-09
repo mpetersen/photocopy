@@ -21,7 +21,7 @@ import javax.swing.*;
 import lombok.Getter;
 
 public class MainWindow extends JFrame {
-  private static final String TITLE = "PhotoCopy";
+  private static final String TITLE = "Photocopy";
   private SourceLabel sourceLabel;
   private FileList fileList;
   private JButton runButton;
