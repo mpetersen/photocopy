@@ -46,17 +46,17 @@ public class MainWindow extends JFrame {
 
     grid = new Grid(this).withColumns(3).withPadding(20).withHGaps(20, 8).withVGap(14);
     grid.add(sourceLabel);
-    addTextField("Rename on copy:", config.getFormatStr(), config::setFormatStr);
+    addTextField("Rename on import:", config.getFormatStr(), config::setFormatStr);
     grid.spanRows().fill().resize().add(fileList);
     addTextField(
         "Target:",
         config.getTarget(),
         (str) -> config.setTarget(Path.of(str)),
         Path::toAbsolutePath);
-    addRadioButton("Erase target before copy", config.isEraseEnabled(), config::setEraseEnabled);
-    addRadioButton("Open target after copy", config.isOpenAfterCopy(), config::setOpenAfterCopy);
+    addRadioButton("Erase target before import", config.isEraseEnabled(), config::setEraseEnabled);
+    addRadioButton("Open target after import", config.isOpenAfterCopy(), config::setOpenAfterCopy);
     addRadioButton("Avoid duplicates", config.isAvoidDuplicates(), config::setAvoidDuplicates);
-    addRadioButton("Eject after copy", config.isEjectEnabled(), config::setEjectEnabled);
+    addRadioButton("Eject after import", config.isEjectEnabled(), config::setEjectEnabled);
     addRadioButton("Auto-import on drop", config.isImportOnDrop(), config::setImportOnDrop);
     addRadioButton(
         "Auto-import known locations",
