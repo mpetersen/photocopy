@@ -20,6 +20,7 @@ public class Grid {
   private double resizeX;
   private double resizeY;
   private int anchor;
+  private int[] hGaps;
 
   public Grid(Container container) {
     this.container = container;
@@ -34,7 +35,7 @@ public class Grid {
     c.anchor = anchor == 0 ? GridBagConstraints.LINE_START : anchor;
 
     int top = y == 0 ? padding : vGap;
-    int left = x == 0 ? padding : hGap;
+    int left = x == 0 ? padding : hGaps == null || hGaps.length < x ? hGap : hGaps[x - 1];
     int bottom = isLastRow ? padding : 0;
     int right = isLastCol ? padding : 0;
     c.insets = new Insets(top, left, bottom, right);
@@ -91,6 +92,11 @@ public class Grid {
 
   public Grid withHGap(int hGap) {
     this.hGap = hGap;
+    return this;
+  }
+
+  public Grid withHGaps(int... hGaps) {
+    this.hGaps = hGaps;
     return this;
   }
 

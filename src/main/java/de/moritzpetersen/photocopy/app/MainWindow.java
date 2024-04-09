@@ -44,7 +44,7 @@ public class MainWindow extends JFrame {
 
     runButton = new JButton("Run " + TITLE);
 
-    grid = new Grid(this).withColumns(3).withPadding(20).withHGap(8).withVGap(14);
+    grid = new Grid(this).withColumns(3).withPadding(20).withHGaps(20, 8).withVGap(14);
     grid.add(sourceLabel);
     addTextField("Rename on copy:", config.getFormatStr(), config::setFormatStr);
     grid.spanRows().fill().resize().add(fileList);
