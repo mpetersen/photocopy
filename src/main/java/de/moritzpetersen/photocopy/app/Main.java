@@ -7,6 +7,7 @@ import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import de.moritzpetersen.factory.Factory;
 import de.moritzpetersen.macos.MacosUtils;
+import de.moritzpetersen.photocopy.app.mainWindow.MainWindow;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.photocopy.copy.CopyExecutor;
 import de.moritzpetersen.photocopy.copy.CopyStats;

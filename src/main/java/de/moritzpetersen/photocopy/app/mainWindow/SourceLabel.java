@@ -1,4 +1,4 @@
-package de.moritzpetersen.photocopy.app;
+package de.moritzpetersen.photocopy.app.mainWindow;
 
 import java.awt.*;
 import javax.swing.*;

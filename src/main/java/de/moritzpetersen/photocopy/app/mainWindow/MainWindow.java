@@ -1,4 +1,4 @@
-package de.moritzpetersen.photocopy.app;
+package de.moritzpetersen.photocopy.app.mainWindow;
 
 import static de.moritzpetersen.photocopy.util.LambdaUtils.runAsync;
 import static de.moritzpetersen.photocopy.util.LambdaUtils.updateSwing;
@@ -7,6 +7,11 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import de.moritzpetersen.factory.Factory;
 import de.moritzpetersen.photocopy.app.fileList.FileList;
 import de.moritzpetersen.photocopy.app.fileList.FileListItem;
+import de.moritzpetersen.photocopy.app.knownLocations.KnownLocationsDialog;
+import de.moritzpetersen.photocopy.app.layout.Grid;
+import de.moritzpetersen.photocopy.app.textComponent.FilePicker;
+import de.moritzpetersen.photocopy.app.textComponent.JTextFieldComponent;
+import de.moritzpetersen.photocopy.app.textComponent.TextComponent;
 import de.moritzpetersen.photocopy.config.Config;
 import de.moritzpetersen.util.swing.DragAndDrop;
 import de.moritzpetersen.util.swing.WindowManager;
@@ -46,12 +51,18 @@ public class MainWindow extends JFrame {
 
     grid = new Grid(this).withColumns(3).withPadding(20).withHGaps(20, 8).withVGap(14);
     grid.add(sourceLabel);
-    addTextField("Rename on import:", config.getFormatStr(), config::setFormatStr);
+    addTextComponent(
+        "Rename on import:",
+        new JTextFieldComponent(20),
+        config.getFormatStr(),
+        config::setFormatStr,
+        null);
     grid.spanRows().fill().resize().add(fileList);
-    addTextField(
+    addTextComponent(
         "Target:",
+        new FilePicker(20, 2),
         config.getTarget(),
-        (str) -> config.setTarget(Path.of(str)),
+        str -> config.setTarget(Path.of(str)),
         Path::toAbsolutePath);
     addRadioButton("Erase target before import", config.isEraseEnabled(), config::setEraseEnabled);
     addRadioButton("Open target after import", config.isOpenAfterCopy(), config::setOpenAfterCopy);
@@ -62,7 +73,9 @@ public class MainWindow extends JFrame {
         "Auto-import known locations",
         config.isImportKnownLocations(),
         config::setImportKnownLocations);
-    addButton("Clear known locations", () -> config.getKnownLocations().clear());
+    JButton clearButton = new JButton("Clear known locations");
+    grid.spanColumns().add(clearButton);
+    clearButton.addActionListener(event -> new KnownLocationsDialog(MainWindow.this).setVisible(true));
     addRadioButton("Quit after import", config.isQuitAfterImport(), config::setQuitAfterImport);
     grid.spanColumns().spanRows().resizeY().lastLineEnd().add(runButton);
 
@@ -92,17 +105,14 @@ public class MainWindow extends JFrame {
         });
   }
 
-  private void addTextField(String label, Object initialValue, Consumer<String> changeHandler) {
-    addTextField(label, initialValue, changeHandler, null);
-  }
-
-  private void addTextField(
+  private void addTextComponent(
       String label,
+      TextComponent component,
       Object initialValue,
       Consumer<String> changeHandler,
       Function<Path, ?> dropFunction) {
-    JTextField component = new JTextField(Objects.toString(initialValue, ""), 20);
-    grid.add(label).add(component);
+    component.setText(Objects.toString(initialValue, ""));
+    grid.add(label).fillX().add((JComponent) component);
 
     component.addKeyListener(
         new KeyAdapter() {
@@ -114,7 +124,7 @@ public class MainWindow extends JFrame {
 
     if (dropFunction != null) {
       DragAndDrop.enableDrop(
-          component,
+          (JComponent) component,
           path -> {
             String value = Objects.toString(dropFunction.apply(path), "");
             component.setText(value);

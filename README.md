@@ -6,20 +6,23 @@ My usual workflow was that I imported photos directly in Adobe Lightroom (Classi
 
 ## Usage
 
-![Screenshot](imgs/screen1.png "Screenshot")
+![Screenshot](./imgs/screen1.png "Screenshot")
 
 The right side of the window shows the configuration parameters:
 
-* Rename on input: Rename each imported photo using the create date.
-* Target: the target directory. Drop the target directory here.
-* Erase target before import: Remove the target directory before the import process.
-* Open target after import: Open the directory in finder after the import is finished.
-* Avoid duplicates: Do not import photos twice.
-* Eject after import: Eject the SD card after import.
-* Auto-import on drop: Immediately start importing when the source is dropped.
-* Auto-import known locations: A known location is a path of a SD card or camera that has been imported before. If this path exists, automatically import when the application starts.
-* Clear known locations: Forget all previously imported paths.
-* Quit after import: Automatically quit the application after the import completes.
+| Parameter | Description
+| --------- | -----------
+| Rename on input | Rename each imported photo using the create date.
+| Target | Enter the path to the target directory. Alternatively, drop the target directory here or chose the target directory using the `...` button.
+| Erase target before import | Remove the target directory before the import process.
+| Open target after import | Open the directory in finder after the import is finished.
+| Avoid duplicates | Do not import photos twice. This option creates a `photocopy.json` file on the SD card which stores the already imported photos.
+| Eject after import | Eject the SD card after import.
+| Auto-import on drop | Immediately start importing when the source is dropped.
+| Auto-import known locations | A known location is a path of a SD card or camera that has been imported before. If this path exists, automatically import when the application starts.
+| Clear known locations | Forget all previously imported paths.
+| Quit after import | Automatically quit the application after the import completes.
+
 
 The left side shows the list of photos to import. Initially the list is empty. Drop the SD card here to import.
 
@@ -32,9 +35,7 @@ The easiest way to build Photocopy is to use the makefile:
 make
 ```
 
-The makefile will build and compile the application (`make build`) and also install a symlink at `/usr/local/bin/photocopy` (`make install`).
-
-The `target` directory will also contain a macOS application `target/Photocopy.app`.
+The makefile will build and compile the application (`make build`) and also install the Application in the `/Applications` folder (`make install`).
 
 ### Self signing
 

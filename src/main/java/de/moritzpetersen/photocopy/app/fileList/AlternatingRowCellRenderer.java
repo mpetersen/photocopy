@@ -1,7 +1,7 @@
 package de.moritzpetersen.photocopy.app.fileList;
 
 
-import de.moritzpetersen.photocopy.app.LabelBorder;
+import de.moritzpetersen.photocopy.app.mainWindow.LabelBorder;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;

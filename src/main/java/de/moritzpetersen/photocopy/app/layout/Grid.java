@@ -1,4 +1,4 @@
-package de.moritzpetersen.photocopy.app;
+package de.moritzpetersen.photocopy.app.layout;
 
 import java.awt.*;
 import java.util.HashSet;

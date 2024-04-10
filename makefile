@@ -16,7 +16,8 @@ name = $(shell basename $(proj))
 all: build install
 
 install:
-	sudo ln -sF $(proj)/bin/run.sh /usr/local/bin/$(name)
+  # No command line installation
+	# sudo ln -sF $(proj)/bin/run.sh /usr/local/bin/$(name)
 	sudo mv -nv target/*.app /Applications
 
 build:
