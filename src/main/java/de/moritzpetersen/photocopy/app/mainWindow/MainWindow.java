@@ -64,19 +64,19 @@ public class MainWindow extends JFrame {
         config.getTarget(),
         str -> config.setTarget(Path.of(str)),
         Path::toAbsolutePath);
-    addRadioButton("Erase target before import", config.isEraseEnabled(), config::setEraseEnabled);
-    addRadioButton("Open target after import", config.isOpenAfterCopy(), config::setOpenAfterCopy);
-    addRadioButton("Avoid duplicates", config.isAvoidDuplicates(), config::setAvoidDuplicates);
-    addRadioButton("Eject after import", config.isEjectEnabled(), config::setEjectEnabled);
-    addRadioButton("Auto-import on drop", config.isImportOnDrop(), config::setImportOnDrop);
-    addRadioButton(
+    addCheckBox("Erase target before import", config.isEraseEnabled(), config::setEraseEnabled);
+    addCheckBox("Open target after import", config.isOpenAfterCopy(), config::setOpenAfterCopy);
+    addCheckBox("Avoid duplicates", config.isAvoidDuplicates(), config::setAvoidDuplicates);
+    addCheckBox("Eject after import", config.isEjectEnabled(), config::setEjectEnabled);
+    addCheckBox("Auto-import on drop", config.isImportOnDrop(), config::setImportOnDrop);
+    addCheckBox(
         "Auto-import known locations",
         config.isImportKnownLocations(),
         config::setImportKnownLocations);
     JButton clearButton = new JButton("Clear known locations");
     grid.spanColumns().add(clearButton);
     clearButton.addActionListener(event -> new KnownLocationsDialog(MainWindow.this).setVisible(true));
-    addRadioButton("Quit after import", config.isQuitAfterImport(), config::setQuitAfterImport);
+    addCheckBox("Quit after import", config.isQuitAfterImport(), config::setQuitAfterImport);
     grid.spanColumns().spanRows().resizeY().lastLineEnd().add(runButton);
 
     pack();
@@ -95,8 +95,8 @@ public class MainWindow extends JFrame {
         });
   }
 
-  private void addRadioButton(String label, boolean initialValue, Consumer<Boolean> changeHandler) {
-    JRadioButton component = new JRadioButton(label, initialValue);
+  private void addCheckBox(String label, boolean initialValue, Consumer<Boolean> changeHandler) {
+    JCheckBox component = new JCheckBox(label, initialValue);
     grid.spanColumns().add(component);
 
     component.addActionListener(
